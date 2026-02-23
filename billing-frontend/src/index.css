@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root[data-theme='industrial'] {
+  --bg-main: #020617;
+  --bg-sidebar: #010409;
+  --bg-card: rgba(15, 23, 42, 0.7);
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.5);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme='corporate'] {
+  --bg-main: #0f172a;
+  --bg-sidebar: #1e293b;
+  --bg-card: #ffffff10;
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.5);
+  --text-main: #ffffff;
+  --text-muted: #cbd5e1;
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='minimal'] {
+  --bg-main: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --accent: #ef4444;
+  --accent-glow: rgba(239, 68, 68, 0.1);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+:root {
+  --bg-deep: var(--bg-main);
+  --accent-blue: var(--accent);
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --text-primary: var(--text-main);
+  --text-secondary: var(--text-muted);
+  --border-light: var(--border);
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--bg-main)] text-[var(--text-main)];
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(239, 68, 68, 0.02) 0px, transparent 50%);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white border border-slate-200 shadow-sm rounded-3xl transition-all;
+  }
+
+  .glass-input {
+    @apply bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 transition-all;
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-500 transition-all duration-300 shadow-lg shadow-red-600/20 active:scale-95 flex items-center justify-center space-x-2;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 bg-white text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm active:scale-95 border border-slate-200 hover:text-red-600;
+  }
+
+  .nav-link-active {
+    @apply bg-red-600/10 text-red-600 border-l-4 border-red-500;
+  }
+
+  .table-header {
+    @apply px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100;
+  }
+
+  .table-row {
+    @apply px-6 py-4 text-sm text-slate-600 border-b border-slate-50 transition-colors hover:bg-slate-50/50;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
+}

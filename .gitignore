@@ -1,0 +1,18 @@
+# Common
+node_modules/
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Backend
+billing-backend/node_modules/
+billing-backend/.env
+billing-backend/logs/
+
+# Frontend
+billing-frontend/node_modules/
+billing-frontend/dist/
+billing-frontend/dist-ssr/
+billing-frontend/.env
+billing-frontend/*.local
