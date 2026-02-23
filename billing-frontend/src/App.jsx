@@ -116,7 +116,9 @@ const Login = () => {
                     <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
+                        name="password"
                         type="password"
+                        autoComplete="current-password"
                         placeholder="••••••••"
                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 transition-all font-medium"
                         value={formData.password}
@@ -161,7 +163,10 @@ const Login = () => {
                     <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
+                        name="new-password"
                         type="password"
+                        autoComplete="new-password"
+                        placeholder="••••••••"
                         required
                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 transition-all font-medium"
                         value={resetData.newPassword}

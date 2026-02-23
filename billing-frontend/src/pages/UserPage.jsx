@@ -199,6 +199,7 @@ const UserPage = () => {
                   <input
                     required={modalMode === 'create'}
                     type="password"
+                    autoComplete="new-password"
                     className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
                     placeholder="••••••••"
                     value={form.password}
