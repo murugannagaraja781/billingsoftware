@@ -11,7 +11,10 @@ import InventoryPage from './pages/InventoryPage';
 import StorePage from './pages/StorePage';
 import UserPage from './pages/UserPage';
 import { Lock, Mail, ChevronRight, Check } from 'lucide-react';
+import axios from 'axios';
+import API_URL from './config';
 import './i18n/config';
+import { useTranslation } from 'react-i18next';
 
 const MainLayout = ({ children }) => {
   const { user } = useAuth();
@@ -32,6 +35,7 @@ const MainLayout = ({ children }) => {
 // Main Layout is already defined above
 
 const Login = () => {
+  const { t } = useTranslation();
   const { login, user, loading } = useAuth();
   if (user) return <Navigate to="/" />;
   const [formData, setFormData] = React.useState({ email: '', password: '' });
@@ -47,18 +51,18 @@ const Login = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('http://localhost:5001/api/auth/forgot-password', resetData);
+      const { data } = await axios.post(`${API_URL}/api/auth/forgot-password`, resetData);
       alert(data.message);
       setView('login');
     } catch (error) {
-      alert(error.response?.data?.message || 'Error resetting password');
+      alert(error.response?.data?.message || t('errorResettingPassword'));
     }
   };
 
   const roles = [
-    { id: 'super_admin', label: 'Super Admin' },
-    { id: 'admin', label: 'Admin' },
-    { id: 'manager', label: 'Manager' },
+    { id: 'super_admin', label: t('superAdmin') },
+    { id: 'admin', label: t('adminRole') },
+    { id: 'manager', label: t('managerRole') },
   ];
 
   return (
@@ -79,13 +83,13 @@ const Login = () => {
           {view === 'login' ? (
             <>
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Welcome Back</h2>
-                <p className="text-slate-500 text-sm font-medium">Manage your billing and scrap waste inventory</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{t('welcomeBack')}</h2>
+                <p className="text-slate-500 text-sm font-medium">{t('loginSubtitle')}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('emailAddress')}</label>
                     <div className="relative group">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
@@ -100,13 +104,13 @@ const Login = () => {
 
                 <div className="space-y-1.5">
                     <div className="flex justify-between items-center ml-1">
-                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Password</label>
+                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{t('password')}</label>
                         <button
                           type="button"
                           onClick={() => setView('forgot')}
                           className="text-[11px] font-bold text-red-600 hover:text-red-500"
                         >
-                          Forgot password?
+                          {t('forgotPassword')}
                         </button>
                     </div>
                     <div className="relative group">
@@ -125,7 +129,7 @@ const Login = () => {
                   disabled={loading}
                   className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl transition-all font-bold text-lg shadow-2xl shadow-red-600/30 flex items-center justify-center space-x-2 group disabled:opacity-50"
                 >
-                  <span>{loading ? 'Authenticating...' : 'Sign In to Dashboard'}</span>
+                  <span>{loading ? t('authenticating') : t('signIn')}</span>
                   {!loading && <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />}
                 </button>
               </form>
@@ -133,13 +137,13 @@ const Login = () => {
           ) : (
             <>
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Reset Password</h2>
-                <p className="text-slate-500 text-sm font-medium">Enter your registered email and a new password</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-2">{t('resetPasswordTitle')}</h2>
+                <p className="text-slate-500 text-sm font-medium">{t('resetPasswordSubtitle')}</p>
               </div>
 
               <form onSubmit={handleResetPassword} className="space-y-6">
                 <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('emailAddress')}</label>
                     <div className="relative group">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
@@ -153,7 +157,7 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('newPassword')}</label>
                     <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
@@ -171,14 +175,14 @@ const Login = () => {
                     type="submit"
                     className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl transition-all font-bold text-lg shadow-2xl shadow-red-600/30"
                   >
-                    Update Password
+                    {t('updatePassword')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setView('login')}
                     className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
                   >
-                    Back to Login
+                    {t('backToLogin')}
                   </button>
                 </div>
               </form>
@@ -188,10 +192,10 @@ const Login = () => {
           <div className="mt-10 pt-8 border-t border-slate-100">
              <div className="flex items-center space-x-2 text-slate-400">
                 <Check size={14} className="text-red-500" />
-                <p className="text-[11px] font-medium tracking-tight">System Online & Secure</p>
+                <p className="text-[11px] font-medium tracking-tight">{t('systemSecure')}</p>
              </div>
              <p className="mt-4 text-center text-[12px] text-slate-400">
-                Don't have an account? <span className="text-red-600 font-bold cursor-pointer hover:underline">Contact System Admin</span>
+                {t('noAccount')} <span className="text-red-600 font-bold cursor-pointer hover:underline">{t('contactAdmin')}</span>
              </p>
           </div>
         </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X, Receipt, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useSocket } from '../context/SocketContext';
 import { useAuth } from '../context/AuthContext';
 
 const NotificationBell = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const { notifications, unreadCount, markAllRead, clearNotifications } = useSocket();
     const [showPanel, setShowPanel] = useState(false);
@@ -22,9 +24,9 @@ const NotificationBell = () => {
         const date = new Date(timestamp);
         const now = new Date();
         const diff = Math.floor((now - date) / 1000);
-        if (diff < 60) return 'Just now';
-        if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-        if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+        if (diff < 60) return t('justNow');
+        if (diff < 3600) return `${Math.floor(diff/60)}${t('minAgo')}`;
+        if (diff < 86400) return `${Math.floor(diff/3600)}${t('hoursAgo')}`;
         return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
     };
 
@@ -52,7 +54,7 @@ const NotificationBell = () => {
                     <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                         <div className="flex items-center space-x-2">
                             <Bell size={16} className="text-red-600" />
-                            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Notifications</h3>
+                            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">{t('notifications')}</h3>
                         </div>
                         <div className="flex items-center space-x-2">
                             {notifications.length > 0 && (
@@ -60,7 +62,7 @@ const NotificationBell = () => {
                                     onClick={clearNotifications}
                                     className="text-[9px] font-bold text-red-500 hover:text-red-700 uppercase tracking-wider"
                                 >
-                                    Clear All
+                                    {t('clearAll')}
                                 </button>
                             )}
                             <button onClick={() => setShowPanel(false)} className="p-1 hover:bg-slate-200 rounded-lg transition-colors">
@@ -74,8 +76,8 @@ const NotificationBell = () => {
                         {notifications.length === 0 ? (
                             <div className="p-8 text-center">
                                 <Bell size={32} className="text-slate-200 mx-auto mb-3" />
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">No notifications yet</p>
-                                <p className="text-[10px] text-slate-300 mt-1">Bill notifications will appear here</p>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('noNotifications')}</p>
+                                <p className="text-[10px] text-slate-300 mt-1">{t('noNotificationsDesc')}</p>
                             </div>
                         ) : (
                             notifications.map((notif) => (
@@ -89,10 +91,10 @@ const NotificationBell = () => {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-xs font-bold text-slate-800 leading-tight">
-                                                🧾 {notif.managerName || 'Manager'} created a bill
+                                                🧾 {notif.managerName || t('manager')} {t('createdBill')}
                                             </p>
                                             <p className="text-[11px] text-slate-500 mt-1">
-                                                Customer: <span className="font-bold">{notif.customerName}</span>
+                                                {t('customer')}: <span className="font-bold">{notif.customerName}</span>
                                             </p>
                                             <div className="flex items-center justify-between mt-2">
                                                 <span className="text-sm font-black text-red-600">

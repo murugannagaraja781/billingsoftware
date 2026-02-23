@@ -27,7 +27,7 @@ const BillingPage = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [products, setProducts] = useState([]);
-  const [customer, setCustomer] = useState({ name: 'Select Customer', phone: '', _id: '' });
+  const [customer, setCustomer] = useState({ name: t('selectCustomerTitle'), phone: '', _id: '' });
   const [customers, setCustomers] = useState([]);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showNewCustModal, setShowNewCustModal] = useState(false);
@@ -61,7 +61,8 @@ const BillingPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setCustomers(data);
-      if (data.length > 0 && customer.name === 'Select Customer') {
+      setCustomers(data);
+      if (data.length > 0 && customer.name === t('selectCustomerTitle')) {
           setCustomer(data[0]);
       }
     } catch (error) {
@@ -147,7 +148,7 @@ const BillingPage = () => {
   const totals = calculateTotals();
 
   const handleSubmit = async () => {
-    if (!customer.name || billItems.length === 0) return alert('Please fill all details');
+    if (!customer.name || billItems.length === 0) return alert(t('fillDetailsError'));
     setLoading(true);
     try {
       const transactionData = {
@@ -166,7 +167,7 @@ const BillingPage = () => {
       setLastTransaction(transactionData);
       setShowSuccessModal(true);
     } catch (error) {
-      alert('Error generating bill');
+      alert(t('errorGeneratingBill'));
     } finally {
       setLoading(false);
     }
@@ -191,14 +192,14 @@ const BillingPage = () => {
             <div className="relative flex justify-between items-center">
                 <div className="flex items-center space-x-6">
                     <div>
-                        <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] mb-1">Live Transaction</p>
+                        <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] mb-1">{t('liveTransaction')}</p>
                         <h3 className="text-2xl font-black text-white tracking-tighter leading-none">{customer.name}</h3>
                     </div>
 
                     <div className="flex items-center space-x-4 pl-6 border-l border-slate-700">
                         <div className="flex items-center space-x-2 text-slate-400">
                             <User size={14} className="text-red-500" />
-                            <span className="text-[11px] font-bold tracking-tight">{customer.phone || 'No phone'}</span>
+                            <span className="text-[11px] font-bold tracking-tight">{customer.phone || t('noPhone')}</span>
                         </div>
                         <div className="flex items-center space-x-2 text-slate-400">
                             <Hash size={14} className="text-red-500" />
@@ -223,7 +224,7 @@ const BillingPage = () => {
                             className="flex items-center space-x-2 px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest"
                         >
                             <LogOut size={14} />
-                            <span>Logout</span>
+                            <span>{t('logout')}</span>
                         </button>
                     )}
                 </div>
@@ -238,10 +239,10 @@ const BillingPage = () => {
                         <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white shadow-md">
                             <ShoppingCart size={16} />
                         </div>
-                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">Sales</h4>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">{t('sales')}</h4>
                     </div>
                     <button onClick={() => addItem('sold')} className="px-3 py-1 bg-red-600 text-white rounded-lg font-black text-[9px] uppercase tracking-widest hover:bg-red-700 transition-all shadow-sm">
-                        + Add Item
+                        {t('addItemPlus')}
                     </button>
                 </div>
 
@@ -249,10 +250,10 @@ const BillingPage = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Item</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">Qty</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Unit</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">Subtotal</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('item')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">{t('qty')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">{t('unit')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">{t('subtotalTable')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -284,11 +285,11 @@ const BillingPage = () => {
                                         <select
                                             value={item.unit}
                                             onChange={(e) => updateItem(billItems.indexOf(item), 'unit', e.target.value)}
-                                            className="w-full bg-slate-50 border border-slate-100 rounded px-1 py-1 text-slate-700 font-bold outline-none text-[11px] text-center cursor-pointer"
+                                            className="w-full bg-slate-50 border border-slate-100 rounded px-1 py-1 text-slate-700 font-bold outline-none text-[12px] text-center cursor-pointer"
                                         >
-                                            <option value="kg">KG</option>
-                                            <option value="pcs">Piece</option>
-                                            <option value="ton">Ton</option>
+                                            <option value="kg">{t('kg')}</option>
+                                            <option value="pcs">{t('piece')}</option>
+                                            <option value="ton">{t('ton')}</option>
                                         </select>
                                     </td>
                                     <td className="px-3 py-2 text-right">
@@ -303,7 +304,7 @@ const BillingPage = () => {
                             ))}
                             {billItems.filter(i => i.type === 'sold').length === 0 && (
                                 <tr>
-                                    <td colSpan="4" className="px-5 py-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">No products added</td>
+                                    <td colSpan="4" className="px-5 py-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">{t('noProductsAdded')}</td>
                                 </tr>
                             )}
                         </tbody>
@@ -318,10 +319,10 @@ const BillingPage = () => {
                         <div className="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center text-white shadow-md">
                             <Recycle size={16} />
                         </div>
-                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">Purchases</h4>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-tighter">{t('purchases')}</h4>
                     </div>
                     <button onClick={() => addItem('bought')} className="px-3 py-1 bg-amber-600 text-white rounded-lg font-black text-[9px] uppercase tracking-widest hover:bg-amber-700 transition-all shadow-sm">
-                        + Add Scrap
+                        {t('addScrapPlus')}
                     </button>
                 </div>
 
@@ -329,10 +330,10 @@ const BillingPage = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Material</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">Qty</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Unit</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">Subtotal</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">{t('material')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">{t('qty')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">{t('unit')}</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">{t('subtotalTable')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -366,9 +367,9 @@ const BillingPage = () => {
                                             onChange={(e) => updateItem(billItems.indexOf(item), 'unit', e.target.value)}
                                             className="w-full bg-slate-50 border border-slate-100 rounded px-1 py-1 text-slate-700 font-bold outline-none text-[11px] text-center cursor-pointer"
                                         >
-                                            <option value="kg">KG</option>
-                                            <option value="pcs">Piece</option>
-                                            <option value="ton">Ton</option>
+                                            <option value="kg">{t('kg')}</option>
+                                            <option value="pcs">{t('piece')}</option>
+                                            <option value="ton">{t('ton')}</option>
                                         </select>
                                     </td>
                                     <td className="px-3 py-2 text-right">
@@ -383,7 +384,7 @@ const BillingPage = () => {
                             ))}
                             {billItems.filter(i => i.type === 'bought').length === 0 && (
                                 <tr>
-                                    <td colSpan="4" className="px-3 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest italic opacity-50">No scrap added</td>
+                                    <td colSpan="4" className="px-3 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest italic opacity-50">{t('noScrapAdded')}</td>
                                 </tr>
                             )}
                         </tbody>
@@ -399,11 +400,11 @@ const BillingPage = () => {
 
         <div className="space-y-3 flex-1 flex flex-col">
             <div className="flex justify-between items-center text-sm font-bold">
-                <span className="text-slate-500 tracking-tight">Total Sales (+)</span>
+                <span className="text-slate-500 tracking-tight">{t('totalSales')} (+)</span>
                 <span className="text-red-600 font-black">₹{totals.totalNew.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-sm font-bold">
-                <span className="text-slate-500 tracking-tight">Total Scrap Buy (-)</span>
+                <span className="text-slate-500 tracking-tight">{t('totalScrapBuy')} (-)</span>
                 <span className="text-amber-600 font-black">-₹{totals.totalWaste.toFixed(2)}</span>
             </div>
 
@@ -517,7 +518,7 @@ const BillingPage = () => {
                             </div>
                         </button>
                     ))}
-                    {customers.length === 0 && <p className="col-span-2 text-center text-slate-400 py-4 font-bold uppercase text-[10px] tracking-widest">No customers found</p>}
+                    {customers.length === 0 && <p className="col-span-2 text-center text-slate-400 py-4 font-bold uppercase text-[10px] tracking-widest">{t('noCustomersFound')}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
@@ -525,7 +526,7 @@ const BillingPage = () => {
                         <Plus size={14} />
                         <span>{t('registerCustomer')}</span>
                     </button>
-                    <button onClick={() => setShowCustomerModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black">Close</button>
+                    <button onClick={() => setShowCustomerModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black">{t('close')}</button>
                 </div>
             </div>
         </div>
@@ -547,7 +548,7 @@ const BillingPage = () => {
                         <input
                             required
                             type="text"
-                            placeholder="e.g. Acme Polymers Ltd"
+                            placeholder={t('businessPlaceholder')}
                             className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
                             value={newCustForm.name}
                             onChange={(e) => setNewCustForm({...newCustForm, name: e.target.value})}
@@ -555,7 +556,7 @@ const BillingPage = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('phoneNumber')}</label>
                             <input
                                 required
                                 type="text"
@@ -566,7 +567,7 @@ const BillingPage = () => {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">GST Number (Optional)</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('gstNumberOptional')}</label>
                             <input
                                 type="text"
                                 placeholder="GSTIN-0000"
@@ -577,9 +578,9 @@ const BillingPage = () => {
                         </div>
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Address</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('address')}</label>
                         <textarea
-                            placeholder="Full factory or office address..."
+                            placeholder={t('addressPlaceholder')}
                             className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold h-24"
                             value={newCustForm.address}
                             onChange={(e) => setNewCustForm({...newCustForm, address: e.target.value})}
@@ -587,8 +588,8 @@ const BillingPage = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-4">
-                        <button type="button" onClick={() => setShowNewCustModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">Cancel</button>
-                        <button type="submit" className="px-6 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20">Register & Select</button>
+                        <button type="button" onClick={() => setShowNewCustModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">{t('cancel')}</button>
+                        <button type="submit" className="px-6 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20">{t('registerAndSelect')}</button>
                     </div>
                 </form>
             </div>

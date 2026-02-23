@@ -30,15 +30,15 @@ const Sidebar = () => {
 
   const menuGroups = [
     {
-      title: 'Main Menu',
+      title: t('mainMenu'),
       items: [
         { name: t('dashboard'), icon: LayoutDashboard, path: '/', roles: ['super_admin', 'admin'] },
         { name: t('billing'), icon: Receipt, path: '/billing' },
-        { name: t('Inventory'), icon: Package, path: '/inventory', roles: ['super_admin', 'admin'] },
+        { name: t('manageInventory'), icon: Package, path: '/inventory', roles: ['super_admin', 'admin'] },
       ]
     },
     {
-      title: 'Management',
+      title: t('management'),
       items: [
         { name: t('stores'), icon: Store, path: '/stores', roles: ['super_admin', 'admin'] },
         { name: t('users'), icon: Users, path: '/users', roles: ['super_admin', 'admin'] },
@@ -91,7 +91,7 @@ const Sidebar = () => {
         >
           <Languages size={18} className="text-red-500 shrink-0" />
           <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-3 text-[10px] font-black uppercase whitespace-nowrap overflow-hidden">
-            {i18n.language === 'en' ? 'ENGLISH' : 'TAMIL'}
+            {i18n.language === 'en' ? t('tamil') : t('english')}
           </span>
         </button>
 
@@ -100,7 +100,7 @@ const Sidebar = () => {
           className="flex items-center justify-center group-hover:justify-between w-full p-2.5 rounded-xl bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white transition-all overflow-hidden"
         >
           <LogOut size={18} className="shrink-0" />
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-3 text-[10px] font-black uppercase whitespace-nowrap overflow-hidden">LOGOUT</span>
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-3 text-[10px] font-black uppercase whitespace-nowrap overflow-hidden">{t('logout')}</span>
         </button>
       </div>
     </div>

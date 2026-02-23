@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 
 const UserPage = () => {
   const { t } = useTranslation();
@@ -31,10 +32,10 @@ const UserPage = () => {
 
   const fetchData = async () => {
     try {
-      const usersRes = await axios.get('http://localhost:5001/api/users', {
+      const usersRes = await axios.get(`${API_URL}/api/users`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
-      const storesRes = await axios.get('http://localhost:5001/api/stores', {
+      const storesRes = await axios.get(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       setUsers(usersRes.data);
@@ -50,11 +51,11 @@ const UserPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post('http://localhost:5001/api/users', form, {
+        await axios.post(`${API_URL}/api/users`, form, {
           headers: { Authorization: `Bearer ${currentUser.token}` }
         });
       } else {
-        await axios.put(`http://localhost:5001/api/users/${selectedUser._id}`, form, {
+        await axios.put(`${API_URL}/api/users/${selectedUser._id}`, form, {
           headers: { Authorization: `Bearer ${currentUser.token}` }
         });
       }
@@ -62,7 +63,7 @@ const UserPage = () => {
       fetchData();
       setForm({ name: '', email: '', password: '', role: 'manager', storeId: '' });
     } catch (error) {
-      alert('Error saving staff member');
+      alert(t('errorSavingStaff'));
     }
   };
 
@@ -174,13 +175,13 @@ const UserPage = () => {
                     required
                     type="text"
                     className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
-                    placeholder="Rahul Sharma"
+                    placeholder={t('namePlaceholder')}
                     value={form.name}
                     onChange={(e) => setForm({...form, name: e.target.value})}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('emailAddress') || 'Email Address'}</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('emailAddress')}</label>
                   <input
                     required
                     type="email"
@@ -194,7 +195,7 @@ const UserPage = () => {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password {modalMode === 'edit' && '(Leave blank to keep current)'}</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('password')} {modalMode === 'edit' && `(${t('leaveBlank')})`}</label>
                   <input
                     required={modalMode === 'create'}
                     type="password"
@@ -233,9 +234,9 @@ const UserPage = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">Cancel</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">{t('cancel')}</button>
                 <button type="submit" className="px-6 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20">
-                  {modalMode === 'create' ? 'Add Member' : 'Apply Changes'}
+                  {modalMode === 'create' ? t('addMember') : t('applyChanges')}
                 </button>
               </div>
             </form>

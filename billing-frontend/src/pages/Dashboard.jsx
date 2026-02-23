@@ -44,7 +44,7 @@ const Dashboard = () => {
   const netRevenue = transactions.reduce((sum, tx) => sum + tx.netAmount, 0);
 
   const handleExport = () => {
-    if (transactions.length === 0) return alert('No data to export');
+    if (transactions.length === 0) return alert(t('noDataToExport'));
 
     // Create CSV content
     const headers = ['Date', 'Invoice ID', 'Customer', 'Phone', 'Sales (₹)', 'Scrap (₹)', 'Net (₹)'];
@@ -214,7 +214,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <span className="text-[10px] font-bold text-slate-600 uppercase mt-4 tracking-tighter">
-                            {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL'][i]}
+                            {t(['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul'][i])}
                         </span>
                     </div>
                 ))}

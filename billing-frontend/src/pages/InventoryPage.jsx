@@ -42,7 +42,7 @@ const InventoryPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/products');
+      const { data } = await axios.get(`${API_URL}/api/products`);
       setProducts(data);
     } catch (error) {
       console.error(error);
@@ -58,7 +58,7 @@ const InventoryPage = () => {
         ? selectedProduct.stock + adjustment.quantity
         : selectedProduct.stock - adjustment.quantity;
 
-      await axios.put(`http://localhost:5001/api/products/${selectedProduct._id}`,
+      await axios.put(`${API_URL}/api/products/${selectedProduct._id}`,
         { stock: newStock },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -67,7 +67,7 @@ const InventoryPage = () => {
       fetchProducts();
       setAdjustment({ type: 'add', quantity: 0, reason: '' });
     } catch (error) {
-      alert('Error updating stock');
+      alert(t('errorUpdatingStock'));
     }
   };
 
@@ -75,11 +75,11 @@ const InventoryPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post('http://localhost:5001/api/products', productForm, {
+        await axios.post(`${API_URL}/api/products`, productForm, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
       } else {
-        await axios.put(`http://localhost:5001/api/products/${selectedProduct._id}`, productForm, {
+        await axios.put(`${API_URL}/api/products/${selectedProduct._id}`, productForm, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
       }
@@ -87,7 +87,7 @@ const InventoryPage = () => {
       fetchProducts();
       setProductForm({ name: '', category: 'new', price: 0, unit: 'kg', description: '', stock: 0 });
     } catch (error) {
-      alert('Error saving product');
+      alert(t('errorSavingProduct'));
     }
   };
 
@@ -158,10 +158,10 @@ const InventoryPage = () => {
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-6">
         {[
-            { label: 'Total Stock Value', value: '₹1,24,500', icon: TrendingUp, color: 'red' },
-            { label: 'Low Stock Items', value: '24 Items', icon: TrendingDown, color: 'amber' },
-            { label: 'Total Categories', value: '12 Classes', icon: Package, color: 'emerald' },
-            { label: 'Active Orders', value: '18 In-Transit', icon: ChevronRight, color: 'purple' },
+            { label: t('totalStockValue'), value: '₹1,24,500', icon: TrendingUp, color: 'red' },
+            { label: t('lowStockItems'), value: '24 Items', icon: TrendingDown, color: 'amber' },
+            { label: t('totalCategories'), value: '12 Classes', icon: Package, color: 'emerald' },
+            { label: t('activeOrders'), value: '18 In-Transit', icon: ChevronRight, color: 'purple' },
         ].map((stat, idx) => (
             <div key={idx} className="bg-white p-6 border border-slate-200 rounded-3xl flex items-center justify-between shadow-sm">
                 <div>
@@ -179,15 +179,15 @@ const InventoryPage = () => {
       <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <div className="flex space-x-6">
-                <button className="text-[11px] font-black text-red-600 uppercase tracking-widest border-b-2 border-red-600 pb-1">All Products</button>
-                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">New Only</button>
-                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">Scrap Only</button>
+                <button className="text-[11px] font-black text-red-600 uppercase tracking-widest border-b-2 border-red-600 pb-1">{t('allProducts')}</button>
+                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">{t('newOnly')}</button>
+                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">{t('scrapOnly')}</button>
             </div>
             <div className="relative group">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={14} />
                 <input
                     type="text"
-                    placeholder="Search product name..."
+                    placeholder={t('searchProductName')}
                     className="bg-white border border-slate-200 rounded-xl py-2 pl-10 pr-4 text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-red-500/30 w-64 shadow-sm"
                 />
             </div>
@@ -235,14 +235,14 @@ const InventoryPage = () => {
                                 <button
                                     onClick={() => { setSelectedProduct(p); setShowModal(true); }}
                                     className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-500/40 transition-all shadow-sm"
-                                    title="Quick Stock Adjustment"
+                                    title={t('quickAdjustment')}
                                 >
                                     <Plus size={16} />
                                 </button>
                                 <button
                                     onClick={() => openEditModal(p)}
                                     className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm"
-                                    title="Edit Product"
+                                    title={t('editProduct')}
                                 >
                                     <Edit3 size={16} />
                                 </button>
@@ -269,7 +269,7 @@ const InventoryPage = () => {
 
                 <div className="space-y-6">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search Product</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('searchProduct')}</label>
                         <div className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 font-bold">{selectedProduct?.name}</div>
                     </div>
 
@@ -300,7 +300,7 @@ const InventoryPage = () => {
                 </div>
               </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Quantity (KG)</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('quantityKg')}</label>
                             <input
                                 type="number"
                                 placeholder="0.00"
@@ -312,9 +312,9 @@ const InventoryPage = () => {
                     </div>
 
                     <div className="space-y-1.5">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Notes</label>
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('notes')}</label>
                          <textarea
-                            placeholder="Reason for adjustment..."
+                            placeholder={t('reasonAdjustment')}
                             className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold h-24"
                             value={adjustment.reason}
                             onChange={(e) => setAdjustment({...adjustment, reason: e.target.value})}
@@ -322,8 +322,8 @@ const InventoryPage = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 pt-4">
-                        <button onClick={() => setShowModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">Cancel</button>
-                        <button onClick={handleAdjustStock} className="px-6 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20 transition-all active:scale-95">Apply Adjustment</button>
+                        <button onClick={() => setShowModal(false)} className="px-6 py-4 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl tracking-widest uppercase text-[10px] font-black hover:bg-slate-100 transition-colors">{t('cancel')}</button>
+                        <button onClick={handleAdjustStock} className="px-6 py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20 transition-all active:scale-95">{t('applyAdjustment')}</button>
                     </div>
                 </div>
             </div>
@@ -338,9 +338,9 @@ const InventoryPage = () => {
                     <X size={24} />
                 </button>
                 <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">
-                    {modalMode === 'create' ? t('addNewProduct') : 'Edit Product'}
+                    {modalMode === 'create' ? t('addNewProduct') : t('editProduct')}
                 </h3>
-                <p className="text-slate-500 text-sm font-medium mb-8 tracking-tight">Configure details for industrial polymers or recycled scrap.</p>
+                <p className="text-slate-500 text-sm font-medium mb-8 tracking-tight">{t('productConfigDesc')}</p>
 
                 <form onSubmit={handleProductSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
@@ -349,7 +349,7 @@ const InventoryPage = () => {
                             <input
                                 required
                                 type="text"
-                                placeholder="e.g. Polypropylene Pellets"
+                                placeholder={t('productPlaceholder')}
                                 className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
                                 value={productForm.name}
                                 onChange={(e) => setProductForm({...productForm, name: e.target.value})}
@@ -386,9 +386,9 @@ const InventoryPage = () => {
                     value={productForm.unit}
                     onChange={(e) => setProductForm({...productForm, unit: e.target.value})}
                   >
-                    <option value="kg">Kilograms (kg)</option>
-                    <option value="pcs">Pieces (pcs)</option>
-                    <option value="ton">Tons (ton)</option>
+                    <option value="kg">{t('kilogramsFull')}</option>
+                    <option value="pcs">{t('piecesFull')}</option>
+                    <option value="ton">{t('tonsFull')}</option>
                   </select>
                 </div>
               </div>

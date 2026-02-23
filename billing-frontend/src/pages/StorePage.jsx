@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 
 const StorePage = () => {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ const StorePage = () => {
 
   const fetchStores = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/stores', {
+      const { data } = await axios.get(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setStores(data);
@@ -44,11 +45,11 @@ const StorePage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post('http://localhost:5001/api/stores', form, {
+        await axios.post(`${API_URL}/api/stores`, form, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
       } else {
-        await axios.put(`http://localhost:5001/api/stores/${selectedStore._id}`, form, {
+        await axios.put(`${API_URL}/api/stores/${selectedStore._id}`, form, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
       }
@@ -56,7 +57,7 @@ const StorePage = () => {
       fetchStores();
       setForm({ name: '', location: '' });
     } catch (error) {
-      alert('Error saving store');
+      alert(t('errorSavingStore'));
     }
   };
 
@@ -138,7 +139,7 @@ const StorePage = () => {
                   required
                   type="text"
                   className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
-                  placeholder="South Branch Warehouse"
+                  placeholder={t('storePlaceholder')}
                   value={form.name}
                   onChange={(e) => setForm({...form, name: e.target.value})}
                 />
@@ -149,7 +150,7 @@ const StorePage = () => {
                   required
                   type="text"
                   className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
-                  placeholder="Industrial Area 4, Chennai"
+                  placeholder={t('locationPlaceholder')}
                   value={form.location}
                   onChange={(e) => setForm({...form, location: e.target.value})}
                 />
