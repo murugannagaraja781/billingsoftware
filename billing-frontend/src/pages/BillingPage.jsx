@@ -181,9 +181,9 @@ const BillingPage = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)]">
+      <div className="flex flex-col md:flex-row bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)] pb-24 md:pb-0">
       {/* Middle Section: Bill Editor - Optimized for Space */}
-      <div className="flex-1 p-4 md:p-6 space-y-4 max-w-[1200px] md:border-r border-slate-200 overflow-y-auto md:h-screen">
+      <div className="flex-1 p-4 md:p-6 space-y-4 max-w-[1200px] md:border-r border-slate-200 overflow-y-auto">
 
         {/* Compact Premium Transaction Header - Hidden Header info on mobile if redundant */}
         <div className="relative bg-slate-900 rounded-2xl md:rounded-[30px] p-4 md:p-6 overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-800 group">
@@ -386,7 +386,7 @@ const BillingPage = () => {
       </div>
 
       {/* Right Sidebar: Order Summary */}
-      <div className="w-80 p-5 bg-white sticky top-0 h-screen flex flex-col border-l border-slate-200">
+      <div className="w-full md:w-80 p-5 bg-white md:sticky md:top-0 md:h-screen flex flex-col border-t md:border-t-0 md:border-l border-slate-200 mb-20 md:mb-0">
         <h4 className="text-base font-black text-[var(--text-primary)] mb-4 tracking-tighter uppercase">{t('orderSummary')}</h4>
 
         <div className="space-y-3 flex-1 flex flex-col">

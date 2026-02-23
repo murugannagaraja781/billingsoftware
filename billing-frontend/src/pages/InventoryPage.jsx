@@ -114,17 +114,17 @@ const InventoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] px-10 py-8 space-y-8 transition-colors duration-500">
+    <div className="min-h-screen bg-[var(--bg-main)] px-4 md:px-10 py-6 md:py-8 space-y-6 md:space-y-8 transition-colors duration-500 pb-24">
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end space-y-4 md:space-y-0">
         <div>
-          <h2 className="text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">{t('manageInventory')}</h2>
-          <p className="text-[var(--text-secondary)] mt-2 font-medium">{t('inventoryDesc')}</p>
+          <h2 className="text-2xl md:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">{t('manageInventory')}</h2>
+          <p className="text-xs md:text-sm text-[var(--text-secondary)] mt-1 md:mt-2 font-medium">{t('inventoryDesc')}</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 w-full md:w-auto">
             <button
                 onClick={() => { setModalMode('create'); setShowProductModal(true); }}
-                className="flex items-center space-x-2 px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-red-600/20"
+                className="flex-1 md:flex-none flex items-center justify-center space-x-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-red-600/20"
             >
                 <Plus size={18} />
                 <span>{t('addNewProduct')}</span>
@@ -133,7 +133,7 @@ const InventoryPage = () => {
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="relative group flex-1 max-w-md">
+        <div className="relative group w-full md:flex-1 md:max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500" size={18} />
             <input
                 type="text"
@@ -141,11 +141,11 @@ const InventoryPage = () => {
                 className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-red-500/10 text-slate-700 text-sm font-medium transition-all shadow-sm"
             />
         </div>
-        <div className="flex items-center space-x-3 overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-hide md:pb-0">
             {['all', 'new', 'waste'].map((cat) => (
                 <button
                     key={cat}
-                    className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                    className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all border ${
                         cat === 'all'
                         ? 'bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/20'
                         : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
@@ -158,30 +158,30 @@ const InventoryPage = () => {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {[
             { label: t('totalStockValue'), value: '₹1,24,500', icon: TrendingUp, color: 'red' },
             { label: t('lowStockItems'), value: '24 Items', icon: TrendingDown, color: 'amber' },
             { label: t('totalCategories'), value: '12 Classes', icon: Package, color: 'emerald' },
             { label: t('activeOrders'), value: '18 In-Transit', icon: ChevronRight, color: 'purple' },
         ].map((stat, idx) => (
-            <div key={idx} className="bg-white p-6 border border-slate-200 rounded-3xl flex items-center justify-between shadow-sm">
-                <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                    <p className="text-xl font-black text-slate-900">{stat.value}</p>
+            <div key={idx} className="bg-white p-4 md:p-6 border border-slate-200 rounded-2xl md:rounded-3xl flex items-center justify-between shadow-sm">
+                <div className="min-w-0">
+                    <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 truncate">{stat.label}</p>
+                    <p className="text-sm md:text-xl font-black text-slate-900 truncate">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-500`}>
-                    <stat.icon size={20} />
+                <div className={`hidden sm:flex p-2 md:p-3 rounded-xl md:rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-500 flex-shrink-0`}>
+                    <stat.icon size={18} className="md:w-[20px] md:h-[20px]" />
                 </div>
             </div>
         ))}
       </div>
 
       {/* Product List */}
-      <div className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <div className="flex space-x-6">
-                <button className="text-[11px] font-black text-red-600 uppercase tracking-widest border-b-2 border-red-600 pb-1">{t('allProducts')}</button>
+      <div className="bg-white rounded-2xl md:rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
+        <div className="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div className="flex space-x-4 md:space-x-6">
+                <button className="text-[9px] md:text-[11px] font-black text-red-600 uppercase tracking-widest border-b-2 border-red-600 pb-1">{t('allProducts')}</button>
             </div>
             <div className="relative group hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={14} />
