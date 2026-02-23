@@ -49,7 +49,7 @@ export const SocketProvider = ({ children }) => {
                 } catch (e) {}
 
                 // Show browser notification
-                if (Notification.permission === 'granted') {
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                     new Notification('🧾 New Bill Created', {
                         body: `${data.managerName} - ₹${data.totalAmount?.toFixed(2)} | Customer: ${data.customerName}`,
                         icon: '/favicon.ico'

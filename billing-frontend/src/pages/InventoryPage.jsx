@@ -30,6 +30,7 @@ const InventoryPage = () => {
   const [productForm, setProductForm] = useState({
     name: '',
     category: 'new',
+    buyPrice: 0,
     price: 0,
     unit: 'kg',
     description: '',
@@ -85,7 +86,7 @@ const InventoryPage = () => {
       }
       setShowProductModal(false);
       fetchProducts();
-      setProductForm({ name: '', category: 'new', price: 0, unit: 'kg', description: '', stock: 0 });
+      setProductForm({ name: '', category: 'new', buyPrice: 0, price: 0, unit: 'kg', description: '', stock: 0 });
     } catch (error) {
       alert(t('errorSavingProduct'));
     }
@@ -96,6 +97,7 @@ const InventoryPage = () => {
     setProductForm({
       name: p.name,
       category: p.category,
+      buyPrice: p.buyPrice || 0,
       price: p.price,
       unit: p.unit,
       description: p.description || '',
@@ -106,7 +108,7 @@ const InventoryPage = () => {
   };
 
   const openCreateModal = () => {
-    setProductForm({ name: '', category: 'new', price: 0, unit: 'kg', description: '', stock: 0 });
+    setProductForm({ name: '', category: 'new', buyPrice: 0, price: 0, unit: 'kg', description: '', stock: 0 });
     setModalMode('create');
     setShowProductModal(true);
   };
@@ -228,7 +230,10 @@ const InventoryPage = () => {
                   </div>
                 </td>
                         <td className="px-8 py-6">
-                            <p className="text-sm font-black text-slate-900">₹{p.price} <span className="text-[10px] font-bold text-slate-400">/ {p.unit}</span></p>
+                            <div className="flex flex-col">
+                                <p className="text-sm font-black text-slate-900">₹{p.price} <span className="text-[10px] font-bold text-slate-400">/ {p.unit}</span></p>
+                                <p className="text-[10px] font-bold text-emerald-600 uppercase">Buy: ₹{p.buyPrice || 0}</p>
+                            </div>
                         </td>
                          <td className="px-8 py-6">
                             <div className="flex items-center space-x-2">
@@ -370,7 +375,17 @@ const InventoryPage = () => {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('marketPrice')}</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('purchasePrice')}</label>
+                  <input
+                    required
+                    type="number"
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
+                    value={productForm.buyPrice}
+                    onChange={(e) => setProductForm({...productForm, buyPrice: parseFloat(e.target.value)})}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('sellingPrice')}</label>
                   <input
                     required
                     type="number"
@@ -379,6 +394,9 @@ const InventoryPage = () => {
                     onChange={(e) => setProductForm({...productForm, price: parseFloat(e.target.value)})}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('unitMeasure')}</label>
                   <select
@@ -391,19 +409,18 @@ const InventoryPage = () => {
                     <option value="ton">{t('tonsFull')}</option>
                   </select>
                 </div>
+                {modalMode === 'create' && (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('initialStock')}</label>
+                    <input
+                      type="number"
+                      className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
+                      value={productForm.stock}
+                      onChange={(e) => setProductForm({...productForm, stock: parseInt(e.target.value)})}
+                    />
+                  </div>
+                )}
               </div>
-
-              {modalMode === 'create' && (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('initialStock')}</label>
-                  <input
-                    type="number"
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"
-                    value={productForm.stock}
-                    onChange={(e) => setProductForm({...productForm, stock: parseInt(e.target.value)})}
-                  />
-                </div>
-              )}
 
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('productDescLabel')}</label>

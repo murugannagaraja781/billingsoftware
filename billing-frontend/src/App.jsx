@@ -229,15 +229,17 @@ const App = () => {
       <AuthProvider>
         <SocketProvider>
           <Router>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<RoleBasedHome />} />
-              <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
-              <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
-              <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
-              <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+            <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center text-white">Loading...</div>}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<RoleBasedHome />} />
+                <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
+                <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
+                <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
+                <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </React.Suspense>
           </Router>
         </SocketProvider>
       </AuthProvider>

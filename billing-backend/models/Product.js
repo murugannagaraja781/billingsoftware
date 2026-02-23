@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
         enum: ['new', 'waste'],
         required: true
     },
+    buyPrice: { type: Number, default: 0 }, // Price at which company buys the product
     price: { type: Number, required: true }, // Selling price for new, Buying price for waste
     description: { type: String },
     unit: { type: String, default: 'kg' }, // kg, piece, etc.

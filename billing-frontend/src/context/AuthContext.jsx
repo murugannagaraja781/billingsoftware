@@ -5,7 +5,14 @@ import API_URL from '../config';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      return stored && stored !== 'undefined' ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {

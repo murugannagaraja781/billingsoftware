@@ -39,9 +39,9 @@ const Dashboard = () => {
     fetchTransactions();
   }, [user.token]);
 
-  const totalSales = transactions.reduce((sum, tx) => sum + tx.totalNewAmount, 0);
-  const totalWaste = transactions.reduce((sum, tx) => sum + tx.totalWasteAmount, 0);
-  const netRevenue = transactions.reduce((sum, tx) => sum + tx.netAmount, 0);
+  const totalSales = (transactions || []).reduce((sum, tx) => sum + (tx.totalNewAmount || 0), 0);
+  const totalWaste = (transactions || []).reduce((sum, tx) => sum + (tx.totalWasteAmount || 0), 0);
+  const netRevenue = (transactions || []).reduce((sum, tx) => sum + (tx.netAmount || 0), 0);
 
   const handleExport = () => {
     if (transactions.length === 0) return alert(t('noDataToExport'));
@@ -103,7 +103,6 @@ const Dashboard = () => {
       trend: t('live'),
       isUp: true
     }
-,
   ];
 
   const recentActivity = transactions.slice(0, 5).map(tx => ({
