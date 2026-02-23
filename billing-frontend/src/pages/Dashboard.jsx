@@ -115,9 +115,9 @@ const Dashboard = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] px-10 py-8 space-y-10 transition-colors duration-500">
-      {/* Top Header */}
-      <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-[var(--bg-main)] px-4 md:px-10 py-6 md:py-8 space-y-6 md:space-y-10 transition-colors duration-500">
+      {/* Top Header - Hidden on mobile as it is in MainLayout */}
+      <div className="hidden md:flex justify-between items-center">
         <div className="relative group w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500" size={18} />
             <input
@@ -127,10 +127,6 @@ const Dashboard = () => {
             />
         </div>
         <div className="flex items-center space-x-4">
-            <button className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-red-500 transition-colors relative shadow-sm">
-                <Bell size={20} />
-                <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
             <button
                 onClick={() => window.location.href='/billing'}
                 className="flex items-center space-x-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-red-600/20"
@@ -142,12 +138,12 @@ const Dashboard = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end space-y-4 md:space-y-0">
         <div>
-            <h2 className="text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">{t('executiveOverview')}</h2>
-            <p className="text-[var(--text-secondary)] mt-2 font-medium">{t('overviewDesc')}</p>
+            <h2 className="text-2xl md:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">{t('executiveOverview')}</h2>
+            <p className="text-[var(--text-secondary)] mt-1 md:mt-2 text-xs md:text-base font-medium">{t('overviewDesc')}</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 w-full md:w-auto">
             <button className="btn-secondary space-x-2 py-2 px-4 shadow-none">
                 <Calendar size={18} className="text-slate-500" />
                 <span className="text-sm">{t('last30Days')}</span>
@@ -160,32 +156,32 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className="glass-card p-8 group hover:border-white/10 transition-all cursor-default">
-            <div className="flex justify-between items-start mb-6">
-              <div className={`p-3.5 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-500 transition-colors`}>
-                <stat.icon size={22} />
+          <div key={idx} className="glass-card p-4 md:p-8 group hover:border-white/10 transition-all cursor-default">
+            <div className="flex justify-between items-start mb-4 md:mb-6">
+              <div className={`p-2.5 md:p-3.5 rounded-xl md:rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-500 transition-colors`}>
+                <stat.icon size={18} className="md:w-[22px] md:h-[22px]" />
               </div>
-              <div className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${stat.isUp ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
+              <div className={`hidden md:flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${stat.isUp ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
                 {stat.isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                 <span>{stat.trend}</span>
               </div>
             </div>
-            <p className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest leading-none mb-3">{stat.label}</p>
-            <p className="text-2xl font-black text-[var(--text-primary)]">{stat.value}</p>
+            <p className="text-[9px] md:text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest leading-none mb-2 md:mb-3">{stat.label}</p>
+            <p className="text-lg md:text-2xl font-black text-[var(--text-primary)]">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Activity and Charts Placeholder */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Main Chart Card */}
-        <div className="lg:col-span-2 glass-card p-8">
-            <div className="flex justify-between items-center mb-8">
+        <div className="lg:col-span-2 glass-card p-6 md:p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 space-y-4 md:space-y-0">
                 <div>
-                    <h3 className="text-xl font-bold text-white">{t('salesVsRecyclingTrend')}</h3>
-                    <p className="text-sm text-slate-500 mt-1">{t('trendDesc')}</p>
+                    <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)]">{t('salesVsRecyclingTrend')}</h3>
+                    <p className="text-xs md:text-sm text-slate-500 mt-1">{t('trendDesc')}</p>
                 </div>
                 <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">

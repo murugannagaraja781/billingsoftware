@@ -182,10 +182,8 @@ const InventoryPage = () => {
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <div className="flex space-x-6">
                 <button className="text-[11px] font-black text-red-600 uppercase tracking-widest border-b-2 border-red-600 pb-1">{t('allProducts')}</button>
-                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">{t('newOnly')}</button>
-                <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors">{t('scrapOnly')}</button>
             </div>
-            <div className="relative group">
+            <div className="relative group hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={14} />
                 <input
                     type="text"
@@ -194,72 +192,106 @@ const InventoryPage = () => {
                 />
             </div>
         </div>
-        <table className="w-full text-left">
-            <thead>
-            <tr className="bg-slate-50">
-              <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('productName')}</th>
-              <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('category')}</th>
-              <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('stock')}</th>
-              <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('price')}</th>
-              <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('actions')}</th>
-            </tr>
-          </thead>
-            <tbody className="divide-y divide-slate-100">
-                {products.map((p) => (
-                    <tr key={p._id} className="hover:bg-slate-50/50 transition-colors group">
-                        <td className="px-8 py-6">
-                            <div className="flex items-center space-x-4">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${p.category === 'new' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                                    {p.name[0]}
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-sm font-black text-slate-900 leading-none">{p.name}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">SKU: PC-{p._id.slice(-6).toUpperCase()}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td className="px-8 py-6">
-                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${p.category === 'new' ? 'bg-blue-600/10 text-blue-600' : 'bg-emerald-600/10 text-emerald-600'}`}>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {products.map((p) => (
+            <div key={p._id} className="p-5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors">
+              <div className="flex items-center space-x-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black ${p.category === 'new' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                  {p.name[0]}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-black text-slate-900 leading-none">{p.name}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">ID: #PL-{p._id.slice(-4).toUpperCase()}</p>
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${p.category === 'new' ? 'bg-emerald-600/10 text-emerald-600' : 'bg-orange-600/10 text-orange-600'}`}>
                     {t(p.category === 'new' ? 'sellProduct' : 'buyScrap')}
                   </span>
-                </td>
-                        <td className="px-8 py-6">
-                  <div className="flex flex-col">
-                    <span className={`text-xs font-black ${p.stock < 10 ? 'text-rose-500' : 'text-slate-900'}`}>{p.stock.toLocaleString()} {p.unit}</span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">{p.stock < 10 ? t('lowStock') : t('inStock')}</span>
-                  </div>
-                </td>
-                        <td className="px-8 py-6">
-                            <div className="flex flex-col">
-                                <p className="text-sm font-black text-slate-900">₹{p.price} <span className="text-[10px] font-bold text-slate-400">/ {p.unit}</span></p>
-                                <p className="text-[10px] font-bold text-emerald-600 uppercase">Buy: ₹{p.buyPrice || 0}</p>
-                            </div>
-                        </td>
-                         <td className="px-8 py-6">
-                            <div className="flex items-center space-x-2">
-                                <button
-                                    onClick={() => { setSelectedProduct(p); setShowModal(true); }}
-                                    className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-500/40 transition-all shadow-sm"
-                                    title={t('quickAdjustment')}
-                                >
-                                    <Plus size={16} />
-                                </button>
-                                <button
-                                    onClick={() => openEditModal(p)}
-                                    className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm"
-                                    title={t('editProduct')}
-                                >
-                                    <Edit3 size={16} />
-                                </button>
-                                <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm">
-                                    <MoreVertical size={16} />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+                </div>
+              </div>
+              <div className="text-right flex flex-col items-end space-y-1">
+                <p className="text-sm font-black text-slate-900 leading-none">{p.stock.toLocaleString()} {p.unit}</p>
+                <p className="text-[10px] font-bold text-slate-400">₹{p.price}/ {p.unit}</p>
+                <button onClick={() => openEditModal(p)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
+                  <Edit3 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+          {products.length === 0 && (
+            <div className="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">{t('noProductsAdded')}</div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block">
+          <table className="w-full text-left">
+              <thead>
+              <tr className="bg-slate-50">
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('productName')}</th>
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('category')}</th>
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('stock')}</th>
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('price')}</th>
+                <th className="px-8 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('actions')}</th>
+              </tr>
+            </thead>
+              <tbody className="divide-y divide-slate-100">
+                  {products.map((p) => (
+                      <tr key={p._id} className="hover:bg-slate-50/50 transition-colors group">
+                          <td className="px-8 py-6">
+                              <div className="flex items-center space-x-4">
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${p.category === 'new' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                      {p.name[0]}
+                                  </div>
+                                  <div className="space-y-1">
+                                      <p className="text-sm font-black text-slate-900 leading-none">{p.name}</p>
+                                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">SKU: PC-{p._id.slice(-6).toUpperCase()}</p>
+                                  </div>
+                              </div>
+                          </td>
+                          <td className="px-8 py-6">
+                    <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${p.category === 'new' ? 'bg-blue-600/10 text-blue-600' : 'bg-emerald-600/10 text-emerald-600'}`}>
+                      {t(p.category === 'new' ? 'sellProduct' : 'buyScrap')}
+                    </span>
+                  </td>
+                          <td className="px-8 py-6">
+                    <div className="flex flex-col">
+                      <span className={`text-xs font-black ${p.stock < 10 ? 'text-rose-500' : 'text-slate-900'}`}>{p.stock.toLocaleString()} {p.unit}</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">{p.stock < 10 ? t('lowStock') : t('inStock')}</span>
+                    </div>
+                  </td>
+                          <td className="px-8 py-6">
+                              <div className="flex flex-col">
+                                  <p className="text-sm font-black text-slate-900">₹{p.price} <span className="text-[10px] font-bold text-slate-400">/ {p.unit}</span></p>
+                                  <p className="text-[10px] font-bold text-emerald-600 uppercase">Buy: ₹{p.buyPrice || 0}</p>
+                              </div>
+                          </td>
+                           <td className="px-8 py-6">
+                              <div className="flex items-center space-x-2">
+                                  <button
+                                      onClick={() => { setSelectedProduct(p); setShowModal(true); }}
+                                      className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-500/40 transition-all shadow-sm"
+                                      title={t('quickAdjustment')}
+                                  >
+                                      <Plus size={16} />
+                                  </button>
+                                  <button
+                                      onClick={() => openEditModal(p)}
+                                      className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm"
+                                      title={t('editProduct')}
+                                  >
+                                      <Edit3 size={16} />
+                                  </button>
+                                  <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+                                      <MoreVertical size={16} />
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>
+                  ))}
+              </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Stock Adjustment Modal */}

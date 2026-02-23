@@ -181,57 +181,48 @@ const BillingPage = () => {
 
   return (
     <>
-      <div className="flex bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)]">
+      <div className="flex flex-col md:flex-row bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)]">
       {/* Middle Section: Bill Editor - Optimized for Space */}
-      <div className="flex-1 p-6 space-y-4 max-w-[1200px] border-r border-slate-200 overflow-y-auto h-screen">
+      <div className="flex-1 p-4 md:p-6 space-y-4 max-w-[1200px] md:border-r border-slate-200 overflow-y-auto md:h-screen">
 
-        {/* Compact Premium Transaction Header */}
-        <div className="relative bg-slate-900 rounded-[30px] p-6 overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-800 group">
+        {/* Compact Premium Transaction Header - Hidden Header info on mobile if redundant */}
+        <div className="relative bg-slate-900 rounded-2xl md:rounded-[30px] p-4 md:p-6 overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-800 group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[60px] -mr-32 -mt-32"></div>
 
-            <div className="relative flex justify-between items-center">
-                <div className="flex items-center space-x-6">
+            <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                <div className="flex flex-col md:flex-row items-start md:items-center md:space-x-6 space-y-2 md:space-y-0">
                     <div>
-                        <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.2em] mb-1">{t('liveTransaction')}</p>
-                        <h3 className="text-2xl font-black text-white tracking-tighter leading-none">{customer.name}</h3>
+                        <p className="text-[8px] md:text-[9px] font-black text-red-500 uppercase tracking-[0.2em] mb-1">{t('liveTransaction')}</p>
+                        <h3 className="text-xl md:text-2xl font-black text-white tracking-tighter leading-none truncate max-w-[200px]">{customer.name}</h3>
                     </div>
 
-                    <div className="flex items-center space-x-4 pl-6 border-l border-slate-700">
+                    <div className="flex items-center space-x-3 md:space-x-4 md:pl-6 md:border-l border-slate-700">
                         <div className="flex items-center space-x-2 text-slate-400">
-                            <User size={14} className="text-red-500" />
-                            <span className="text-[11px] font-bold tracking-tight">{customer.phone || t('noPhone')}</span>
+                            <User size={12} className="text-red-500 md:w-[14px] md:h-[14px]" />
+                            <span className="text-[10px] md:text-[11px] font-bold tracking-tight">{customer.phone || t('noPhone')}</span>
                         </div>
                         <div className="flex items-center space-x-2 text-slate-400">
-                            <Hash size={14} className="text-red-500" />
-                            <span className="text-[11px] font-bold tracking-tight">{invoiceId}</span>
+                            <Hash size={12} className="text-red-500 md:w-[14px] md:h-[14px]" />
+                            <span className="text-[10px] md:text-[11px] font-bold tracking-tight">{invoiceId}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-between w-full md:w-auto md:space-x-3">
                     <button
                         onClick={() => setShowCustomerModal(true)}
-                        className="px-5 py-2.5 bg-white hover:bg-red-500 text-slate-900 hover:text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                        className="px-4 md:px-5 py-2 md:py-2.5 bg-white hover:bg-red-500 text-slate-900 hover:text-white rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
                     >
                         {t('createNewCustomer')}
                     </button>
-                    <div className="px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="hidden md:block px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </div>
-                    {user?.role === 'manager' && (
-                        <button
-                            onClick={logout}
-                            className="flex items-center space-x-2 px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest"
-                        >
-                            <LogOut size={14} />
-                            <span>{t('logout')}</span>
-                        </button>
-                    )}
                 </div>
             </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Sales Section - Optimized for Multi-bill */}
             <div className="space-y-3">
                 <div className="flex items-center justify-between px-2">

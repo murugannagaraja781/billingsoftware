@@ -4,13 +4,14 @@ import { useAuth, AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SocketProvider } from './context/SocketContext';
 import Sidebar from './components/Sidebar';
+import BottomNav from './components/BottomNav';
 import NotificationBell from './components/NotificationBell';
 import BillingPage from './pages/BillingPage';
 import Dashboard from './pages/Dashboard';
 import InventoryPage from './pages/InventoryPage';
 import StorePage from './pages/StorePage';
 import UserPage from './pages/UserPage';
-import { Lock, Mail, ChevronRight, Check } from 'lucide-react';
+import { Lock, Mail, ChevronRight, Check, Sun, Moon, Bell } from 'lucide-react';
 import axios from 'axios';
 import API_URL from './config';
 import './i18n/config';
@@ -18,16 +19,37 @@ import { useTranslation } from 'react-i18next';
 
 const MainLayout = ({ children }) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   if (!user) return <Navigate to="/login" />;
   const isManager = user.role === 'manager';
 
   return (
-    <div className="flex bg-[var(--bg-main)] text-[var(--text-main)] min-h-screen transition-colors duration-500">
-      {!isManager && <Sidebar />}
-      {!isManager && <NotificationBell />}
-      <main className={`flex-1 min-h-screen ${isManager ? 'ml-0' : 'ml-20'}`}>
+    <div className="flex flex-col md:flex-row bg-[var(--bg-main)] text-[var(--text-main)] min-h-screen transition-colors duration-500">
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 sticky top-0 z-[90]">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20">
+            <span className="text-white font-black text-xl italic">P</span>
+          </div>
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">
+            {window.location.pathname === '/' ? t('dashboard') :
+             window.location.pathname === '/billing' ? t('billing') :
+             window.location.pathname === '/inventory' ? t('products') :
+             window.location.pathname === '/stores' ? t('stores') :
+             window.location.pathname === '/users' ? t('users') : 'PlastiCore'}
+          </h2>
+        </div>
+        <div className="flex items-center space-x-2">
+           <NotificationBell />
+        </div>
+      </div>
+
+      {!isManager && <div className="hidden md:block"><Sidebar /></div>}
+      <main className={`flex-1 min-h-screen pb-24 md:pb-0 ${isManager ? 'md:ml-0' : 'md:ml-20'}`}>
         {children}
       </main>
+
+      {!isManager && <BottomNav />}
     </div>
   );
 };
@@ -225,11 +247,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SocketProvider>
-          <Router>
-            <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center text-white">Loading...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center text-white">Loading...</div>}>
+      <ThemeProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <Router>
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<RoleBasedHome />} />
@@ -239,11 +261,11 @@ const App = () => {
                 <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
-            </React.Suspense>
-          </Router>
-        </SocketProvider>
-      </AuthProvider>
-    </ThemeProvider>
+            </Router>
+          </SocketProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </React.Suspense>
   );
 };
 

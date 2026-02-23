@@ -32,11 +32,11 @@ const NotificationBell = () => {
 
     return (
         <>
-            {/* Bell Icon - Fixed Position */}
-            <div className="fixed top-4 right-4 z-[100]">
+            {/* Bell Icon */}
+            <div className="md:fixed md:top-4 md:right-4 z-[100]">
                 <button
                     onClick={() => { setShowPanel(!showPanel); if (!showPanel) markAllRead(); }}
-                    className="relative p-3 bg-white rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                    className="relative p-2.5 md:p-3 bg-white rounded-xl md:rounded-2xl shadow-lg border border-slate-200 hover:shadow-xl transition-all hover:scale-105 active:scale-95"
                 >
                     <Bell size={20} className={unreadCount > 0 ? 'text-red-600 animate-bounce' : 'text-slate-500'} />
                     {unreadCount > 0 && (
