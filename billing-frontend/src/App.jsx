@@ -67,7 +67,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await login(formData.email, formData.password);
-    if (!res.success) alert(res.message);
+    if (!res.success) {
+      alert(res.message);
+    } else {
+      window.location.reload();
+    }
   };
 
   const handleResetPassword = async (e) => {
