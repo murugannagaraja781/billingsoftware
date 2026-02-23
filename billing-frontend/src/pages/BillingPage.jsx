@@ -16,14 +16,16 @@ import {
   X,
   User,
   Hash,
-  Calendar
+  Calendar,
+  LogOut
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 
 const BillingPage = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState({ name: 'Select Customer', phone: '', _id: '' });
   const [customers, setCustomers] = useState([]);
@@ -34,6 +36,9 @@ const BillingPage = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastTransaction, setLastTransaction] = useState(null);
+  const [shippingEnabled, setShippingEnabled] = useState(false);
+  const [shippingAmount, setShippingAmount] = useState(0);
+  const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
 
   useEffect(() => {
@@ -43,7 +48,7 @@ const BillingPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/products');
+      const { data } = await axios.get(`${API_URL}/api/products`);
       setProducts(data);
     } catch (error) {
       console.error(error);
@@ -52,7 +57,7 @@ const BillingPage = () => {
 
   const fetchCustomers = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5001/api/customers', {
+      const { data } = await axios.get(`${API_URL}/api/customers`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setCustomers(data);
@@ -67,7 +72,7 @@ const BillingPage = () => {
   const handleCreateCustomer = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post('http://localhost:5001/api/customers', newCustForm, {
+      const { data } = await axios.post(`${API_URL}/api/customers`, newCustForm, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setCustomers([...customers, data]);
@@ -89,6 +94,7 @@ const BillingPage = () => {
       productName: '',
       quantity: 0,
       unitPrice: 0,
+      unit: 'kg',
       type, // 'sold' for new, 'bought' for waste
       subTotal: 0
     }]);
@@ -103,6 +109,9 @@ const BillingPage = () => {
       item.productId = value;
       item.productName = product.name;
       item.unitPrice = product.price;
+      item.unit = product.unit || 'kg';
+    } else if (field === 'quantity' || field === 'unitPrice') {
+      item[field] = parseFloat(value) || 0;
     } else {
       item[field] = value;
     }
@@ -123,8 +132,8 @@ const BillingPage = () => {
       .filter(i => i.type === 'bought')
       .reduce((sum, i) => sum + i.subTotal, 0);
     const subtotal = totalNew - totalWaste;
-    const tax = subtotal * 0.18; // 18% GST example
-    const logistics = subtotal > 0 ? 45 : 0;
+    const tax = gstEnabled ? subtotal * 0.18 : 0; // 18% GST
+    const logistics = shippingEnabled ? parseFloat(shippingAmount) || 0 : 0;
     return {
       totalNew,
       totalWaste,
@@ -151,7 +160,7 @@ const BillingPage = () => {
         storeId: user.storeId,
         invoiceId: invoiceId
       };
-      await axios.post('http://localhost:5001/api/transactions', transactionData, {
+      await axios.post(`${API_URL}/api/transactions`, transactionData, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setLastTransaction(transactionData);
@@ -208,6 +217,15 @@ const BillingPage = () => {
                     <div className="px-3 py-1.5 bg-slate-800/50 rounded-lg border border-slate-700 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                         {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </div>
+                    {user?.role === 'manager' && (
+                        <button
+                            onClick={logout}
+                            className="flex items-center space-x-2 px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-xl transition-all text-[10px] font-black uppercase tracking-widest"
+                        >
+                            <LogOut size={14} />
+                            <span>Logout</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -232,7 +250,8 @@ const BillingPage = () => {
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Item</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Qty</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">Qty</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Unit</th>
                                 <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">Subtotal</th>
                             </tr>
                         </thead>
@@ -254,14 +273,27 @@ const BillingPage = () => {
                                     <td className="px-3 py-2">
                                         <input
                                             type="number"
-                                            value={item.quantity}
-                                            onChange={(e) => updateItem(billItems.indexOf(item), 'quantity', parseFloat(e.target.value))}
+                                            step={item.unit === 'pcs' ? '1' : '0.001'}
+                                            value={item.quantity || ''}
+                                            onChange={(e) => updateItem(billItems.indexOf(item), 'quantity', e.target.value)}
+                                            placeholder={item.unit === 'pcs' ? '0' : '0.000'}
                                             className="w-full bg-slate-50 border border-slate-100 rounded px-2 py-1 text-slate-700 font-bold outline-none text-[12px] text-center"
                                         />
                                     </td>
+                                    <td className="px-3 py-2">
+                                        <select
+                                            value={item.unit}
+                                            onChange={(e) => updateItem(billItems.indexOf(item), 'unit', e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-100 rounded px-1 py-1 text-slate-700 font-bold outline-none text-[11px] text-center cursor-pointer"
+                                        >
+                                            <option value="kg">KG</option>
+                                            <option value="pcs">Piece</option>
+                                            <option value="ton">Ton</option>
+                                        </select>
+                                    </td>
                                     <td className="px-3 py-2 text-right">
                                         <div className="flex items-center justify-end space-x-2">
-                                            <span className="text-slate-900 font-black text-[12px]">₹{item.subTotal.toFixed(0)}</span>
+                                            <span className="text-slate-900 font-black text-[12px]">₹{item.subTotal.toFixed(2)}</span>
                                             <button onClick={() => removeItem(billItems.indexOf(item))} className="p-1 text-slate-300 hover:text-red-500 transition-all">
                                                 <Trash2 size={12} />
                                             </button>
@@ -271,7 +303,7 @@ const BillingPage = () => {
                             ))}
                             {billItems.filter(i => i.type === 'sold').length === 0 && (
                                 <tr>
-                                    <td colSpan="3" className="px-5 py-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">No products added</td>
+                                    <td colSpan="4" className="px-5 py-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">No products added</td>
                                 </tr>
                             )}
                         </tbody>
@@ -298,7 +330,8 @@ const BillingPage = () => {
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Material</th>
-                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Qty</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-28">Qty</th>
+                                <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-center w-20">Unit</th>
                                 <th className="px-3 py-2 text-[9px] font-bold text-slate-500 uppercase tracking-wider text-right w-24">Subtotal</th>
                             </tr>
                         </thead>
@@ -320,14 +353,27 @@ const BillingPage = () => {
                                     <td className="px-3 py-2">
                                         <input
                                             type="number"
-                                            value={item.quantity}
-                                            onChange={(e) => updateItem(billItems.indexOf(item), 'quantity', parseFloat(e.target.value))}
+                                            step={item.unit === 'pcs' ? '1' : '0.001'}
+                                            value={item.quantity || ''}
+                                            onChange={(e) => updateItem(billItems.indexOf(item), 'quantity', e.target.value)}
+                                            placeholder={item.unit === 'pcs' ? '0' : '0.000'}
                                             className="w-full bg-slate-50 border border-slate-100 rounded px-2 py-1 text-slate-700 font-bold outline-none text-[12px] text-center"
                                         />
                                     </td>
+                                    <td className="px-3 py-2">
+                                        <select
+                                            value={item.unit}
+                                            onChange={(e) => updateItem(billItems.indexOf(item), 'unit', e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-100 rounded px-1 py-1 text-slate-700 font-bold outline-none text-[11px] text-center cursor-pointer"
+                                        >
+                                            <option value="kg">KG</option>
+                                            <option value="pcs">Piece</option>
+                                            <option value="ton">Ton</option>
+                                        </select>
+                                    </td>
                                     <td className="px-3 py-2 text-right">
                                         <div className="flex items-center justify-end space-x-2">
-                                            <span className="text-amber-600 font-black text-[12px]">-₹{item.subTotal.toFixed(0)}</span>
+                                            <span className="text-amber-600 font-black text-[12px]">-₹{item.subTotal.toFixed(2)}</span>
                                             <button onClick={() => removeItem(billItems.indexOf(item))} className="p-1 text-slate-300 hover:text-red-500 transition-all">
                                                 <Trash2 size={12} />
                                             </button>
@@ -337,7 +383,7 @@ const BillingPage = () => {
                             ))}
                             {billItems.filter(i => i.type === 'bought').length === 0 && (
                                 <tr>
-                                    <td colSpan="3" className="px-3 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest italic opacity-50">No scrap added</td>
+                                    <td colSpan="4" className="px-3 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest italic opacity-50">No scrap added</td>
                                 </tr>
                             )}
                         </tbody>
@@ -348,10 +394,10 @@ const BillingPage = () => {
       </div>
 
       {/* Right Sidebar: Order Summary */}
-      <div className="w-96 p-10 bg-white sticky top-0 h-screen overflow-y-auto border-l border-slate-200">
-        <h4 className="text-xl font-black text-[var(--text-primary)] mb-8 tracking-tighter uppercase">{t('orderSummary')}</h4>
+      <div className="w-80 p-5 bg-white sticky top-0 h-screen flex flex-col border-l border-slate-200">
+        <h4 className="text-base font-black text-[var(--text-primary)] mb-4 tracking-tighter uppercase">{t('orderSummary')}</h4>
 
-        <div className="space-y-6">
+        <div className="space-y-3 flex-1 flex flex-col">
             <div className="flex justify-between items-center text-sm font-bold">
                 <span className="text-slate-500 tracking-tight">Total Sales (+)</span>
                 <span className="text-red-600 font-black">₹{totals.totalNew.toFixed(2)}</span>
@@ -361,67 +407,88 @@ const BillingPage = () => {
                 <span className="text-amber-600 font-black">-₹{totals.totalWaste.toFixed(2)}</span>
             </div>
 
-            <div className="h-px bg-slate-100 my-6"></div>
+            <div className="h-px bg-slate-100"></div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest">
                     <span className="text-slate-400">{t('subtotal')}</span>
                     <span className="text-slate-900">₹{totals.subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest">
-                    <span className="text-slate-400">{t('taxes')}</span>
-                    <span className="text-slate-900">₹{totals.tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest">
-                    <span className="text-slate-400">{t('shippingLogistics')}</span>
-                    <span className="text-slate-900">₹{totals.logistics.toFixed(2)}</span>
-                </div>
-            </div>
-
-            <div className="mt-12 p-8 rounded-3xl bg-red-600/5 border border-red-600/10 relative overflow-hidden group shadow-sm">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-3xl -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-700"></div>
-                <p className="text-[10px] font-black text-red-600 uppercase tracking-widest text-center mb-2">{t('netReceivable')}</p>
-                <p className="text-4xl font-black text-slate-900 text-center tracking-tighter">₹{totals.net.toLocaleString()}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mt-12 pt-8 border-t border-slate-100">
-                <button onClick={handlePrint} className="flex flex-col items-center justify-center p-8 bg-slate-50 hover:bg-white border border-slate-200 rounded-[32px] space-y-3 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-all text-slate-400">
-                        <Printer size={20} />
+                {/* GST Tax - Optional Toggle */}
+                <div className="p-2.5 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 space-y-1.5">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={() => setGstEnabled(!gstEnabled)}
+                                className={`relative w-8 h-[18px] rounded-full transition-all duration-300 ${gstEnabled ? 'bg-red-500' : 'bg-slate-300'}`}
+                            >
+                                <span className={`absolute top-[2px] left-[2px] w-[14px] h-[14px] bg-white rounded-full shadow-sm transition-transform duration-300 ${gstEnabled ? 'translate-x-[14px]' : 'translate-x-0'}`} />
+                            </button>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('taxes')}</span>
+                        </div>
+                        <span className={`text-xs font-black ${gstEnabled ? 'text-slate-900' : 'text-slate-300'}`}>₹{totals.tax.toFixed(2)}</span>
                     </div>
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('printInvoice')}</span>
+                </div>
+
+                {/* Shipping/Logistics - Optional Toggle */}
+                <div className="p-2.5 rounded-xl border border-dashed border-slate-200 bg-slate-50/50 space-y-1.5">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                            <button
+                                onClick={() => setShippingEnabled(!shippingEnabled)}
+                                className={`relative w-8 h-[18px] rounded-full transition-all duration-300 ${shippingEnabled ? 'bg-red-500' : 'bg-slate-300'}`}
+                            >
+                                <span className={`absolute top-[2px] left-[2px] w-[14px] h-[14px] bg-white rounded-full shadow-sm transition-transform duration-300 ${shippingEnabled ? 'translate-x-[14px]' : 'translate-x-0'}`} />
+                            </button>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('shippingLogistics')}</span>
+                        </div>
+                        <span className={`text-xs font-black ${shippingEnabled ? 'text-slate-900' : 'text-slate-300'}`}>₹{totals.logistics.toFixed(2)}</span>
+                    </div>
+                    {shippingEnabled && (
+                        <div className="flex items-center space-x-2">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">₹</span>
+                            <input
+                                type="number"
+                                value={shippingAmount}
+                                onChange={(e) => setShippingAmount(e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-slate-800 font-bold text-xs outline-none focus:ring-2 focus:ring-red-500/20 transition-all"
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="mt-4 p-5 rounded-2xl bg-red-600/5 border border-red-600/10 relative overflow-hidden group shadow-sm">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-red-500/5 rounded-full blur-3xl -mr-10 -mt-10 transition-transform group-hover:scale-150 duration-700"></div>
+                <p className="text-[9px] font-black text-red-600 uppercase tracking-widest text-center mb-1">{t('netReceivable')}</p>
+                <p className="text-3xl font-black text-slate-900 text-center tracking-tighter">₹{totals.net.toLocaleString()}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
+                <button onClick={handlePrint} className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-white border border-slate-200 rounded-2xl space-y-2 transition-all group shadow-sm hover:shadow-lg hover:-translate-y-0.5">
+                    <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-all text-slate-400">
+                        <Printer size={16} />
+                    </div>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.15em]">{t('printInvoice')}</span>
                 </button>
-                <button className="flex flex-col items-center justify-center p-8 bg-slate-50 hover:bg-white border border-slate-200 rounded-[32px] space-y-3 transition-all group shadow-sm hover:shadow-xl hover:-translate-y-1">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-all text-slate-400">
-                        <CreditCard size={20} />
+                <button className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-white border border-slate-200 rounded-2xl space-y-2 transition-all group shadow-sm hover:shadow-lg hover:-translate-y-0.5">
+                    <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:bg-red-500 group-hover:text-white transition-all text-slate-400">
+                        <CreditCard size={16} />
                     </div>
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('saveDraft')}</span>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.15em]">{t('saveDraft')}</span>
                 </button>
             </div>
 
             <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full mt-10 py-5 bg-red-600 hover:bg-red-500 text-white rounded-3xl font-black text-lg shadow-2xl shadow-red-600/30 flex items-center justify-center space-x-3 transition-all active:scale-95 disabled:opacity-50"
+                className="w-full mt-auto py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black text-sm shadow-2xl shadow-red-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95 disabled:opacity-50"
             >
-                <CheckIcon size={24} />
+                <CheckIcon size={20} />
                 <span>{loading ? t('finalizing') : t('finalizePay')}</span>
-                <ArrowRight size={24} className="ml-2" />
+                <ArrowRight size={20} className="ml-1" />
             </button>
-        </div>
-
-        <div className="mt-10 p-6 bg-slate-50 rounded-3xl border border-slate-200 shadow-sm flex items-start space-x-4">
-            <div className="p-3 bg-red-500/10 text-red-500 rounded-2xl">
-                <Truck size={20} />
-            </div>
-            <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">{t('deliveryDestination')}</p>
-                <p className="text-[12px] font-black text-slate-800 leading-tight">North Industrial Hub, Sector 24, Zone A</p>
-                <div className="flex items-center space-x-2 mt-2 text-red-600">
-                    <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider">{t('inTransit')}</span>
-                </div>
-            </div>
         </div>
       </div>
     </div>

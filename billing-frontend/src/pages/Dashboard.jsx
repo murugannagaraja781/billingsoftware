@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import API_URL from '../config';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5001/api/transactions', {
+        const { data } = await axios.get(`${API_URL}/api/transactions`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setTransactions(data);

@@ -2,7 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth, AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { SocketProvider } from './context/SocketContext';
 import Sidebar from './components/Sidebar';
+import NotificationBell from './components/NotificationBell';
 import BillingPage from './pages/BillingPage';
 import Dashboard from './pages/Dashboard';
 import InventoryPage from './pages/InventoryPage';
@@ -14,11 +16,13 @@ import './i18n/config';
 const MainLayout = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
+  const isManager = user.role === 'manager';
 
   return (
     <div className="flex bg-[var(--bg-main)] text-[var(--text-main)] min-h-screen transition-colors duration-500">
-      <Sidebar />
-      <main className="flex-1 ml-20 min-h-screen">
+      {!isManager && <Sidebar />}
+      {!isManager && <NotificationBell />}
+      <main className={`flex-1 min-h-screen ${isManager ? 'ml-0' : 'ml-20'}`}>
         {children}
       </main>
     </div>
@@ -196,21 +200,37 @@ const Login = () => {
   );
 };
 
+const RoleBasedHome = () => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" />;
+  if (user.role === 'manager') return <Navigate to="/billing" />;
+  return <MainLayout><Dashboard /></MainLayout>;
+};
+
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/billing" />;
+  return children;
+};
+
 const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
-            <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
-            <Route path="/inventory" element={<MainLayout><InventoryPage /></MainLayout>} />
-            <Route path="/stores" element={<MainLayout><StorePage /></MainLayout>} />
-            <Route path="/users" element={<MainLayout><UserPage /></MainLayout>} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Router>
+        <SocketProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<RoleBasedHome />} />
+              <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
+              <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
+              <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
+              <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Router>
+        </SocketProvider>
       </AuthProvider>
     </ThemeProvider>
   );

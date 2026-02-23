@@ -32,24 +32,16 @@ const Sidebar = () => {
     {
       title: 'Main Menu',
       items: [
-        { name: t('dashboard'), icon: LayoutDashboard, path: '/' },
+        { name: t('dashboard'), icon: LayoutDashboard, path: '/', roles: ['super_admin', 'admin'] },
         { name: t('billing'), icon: Receipt, path: '/billing' },
-        { name: t('Inventory'), icon: Package, path: '/inventory' },
+        { name: t('Inventory'), icon: Package, path: '/inventory', roles: ['super_admin', 'admin'] },
       ]
     },
     {
       title: 'Management',
-      roles: ['super_admin', 'admin'],
       items: [
-        { name: t('stores'), icon: Store, path: '/stores' },
-        { name: t('users'), icon: Users, path: '/users' },
-      ]
-    },
-    {
-      title: 'Support',
-      items: [
-        { name: 'Settings', icon: Settings, path: '/settings' },
-        { name: 'Help Center', icon: HelpCircle, path: '/help' },
+        { name: t('stores'), icon: Store, path: '/stores', roles: ['super_admin', 'admin'] },
+        { name: t('users'), icon: Users, path: '/users', roles: ['super_admin', 'admin'] },
       ]
     }
   ];
@@ -65,8 +57,10 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 px-3 mt-8 space-y-2 overflow-y-auto">
-        {menuGroups.flatMap(g => g.items || []).map((item) => {
-          if (item.roles && !item.roles.includes(user?.role)) return null;
+        {menuGroups.flatMap(g => g.items || []).filter(item => {
+          if (item.roles && !item.roles.includes(user?.role)) return false;
+          return true;
+        }).map((item) => {
           const Icon = item.icon;
           return (
             <NavLink

@@ -46,6 +46,20 @@ const createTransaction = async (req, res) => {
         }
 
         const createdTransaction = await transaction.save();
+
+        // Emit real-time notification to admin/super_admin
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('new-bill', {
+                message: `${req.user.name || 'Manager'} created a new bill`,
+                customerName,
+                totalAmount: netAmount,
+                managerName: req.user.name,
+                transactionId: createdTransaction._id,
+                timestamp: new Date()
+            });
+        }
+
         res.status(201).json(createdTransaction);
     } catch (error) {
         res.status(400).json({ message: error.message });
