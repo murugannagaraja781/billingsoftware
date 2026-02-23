@@ -38,10 +38,14 @@ const BottomNav = () => {
               ${isActive ? 'text-red-600' : 'text-slate-400'}
             `}
           >
-            <div className={`p-1.5 rounded-xl transition-all ${item.path === window.location.pathname ? 'bg-red-50' : ''}`}>
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-tight">{item.name}</span>
+            {({ isActive }) => (
+              <>
+                <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-red-50' : ''}`}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-tight">{item.name}</span>
+              </>
+            )}
           </NavLink>
         );
       })}

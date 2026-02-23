@@ -60,7 +60,7 @@ const Login = () => {
   const { t } = useTranslation();
   const { login, user, loading } = useAuth();
   if (user) return <Navigate to="/" />;
-  const [formData, setFormData] = React.useState({ email: '', password: '' });
+  const [formData, setFormData] = React.useState({ email: 'admin@plastic-corp.com', password: 'password123' });
   const [view, setView] = React.useState('login'); // 'login' or 'forgot'
   const [resetData, setResetData] = React.useState({ email: '', newPassword: '' });
 

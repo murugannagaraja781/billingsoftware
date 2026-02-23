@@ -19,7 +19,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password });
-      setUser(data);
+      React.startTransition(() => {
+        setUser(data);
+      });
       localStorage.setItem('user', JSON.stringify(data));
       return { success: true };
     } catch (error) {
@@ -30,7 +32,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setUser(null);
+    React.startTransition(() => {
+      setUser(null);
+    });
     localStorage.removeItem('user');
   };
 
