@@ -549,7 +549,6 @@ const BillingPage = () => {
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('phoneNumber')}</label>
                             <input
-                                required
                                 type="text"
                                 placeholder="+91 00000 00000"
                                 className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold"

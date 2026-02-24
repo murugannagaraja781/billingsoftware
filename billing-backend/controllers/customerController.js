@@ -12,9 +12,11 @@ const getCustomers = async (req, res) => {
 const createCustomer = async (req, res) => {
     const { name, phone, address, gstNumber } = req.body;
     try {
-        const customerExists = await Customer.findOne({ phone });
-        if (customerExists) {
-            return res.status(400).json({ message: 'Customer with this phone already exists' });
+        if (phone) {
+            const customerExists = await Customer.findOne({ phone });
+            if (customerExists) {
+                return res.status(400).json({ message: 'Customer with this phone already exists' });
+            }
         }
         const customer = new Customer({ name, phone, address, gstNumber });
         const createdCustomer = await customer.save();
