@@ -616,67 +616,118 @@ const BillingPage = () => {
         </div>
       )}
 
+      {/* Printable Invoice - Hidden in UI, Visible in Print */}
+      <div id="printable-invoice" className="hidden print:block p-8 bg-white text-black font-sans">
+          <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-6">
+              <div>
+                  <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">PlastiCore</h1>
+                  <p className="text-sm font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
+                  <p className="text-xs text-slate-500 mt-1 italic">{new Date().toLocaleString()}</p>
+              </div>
+              <div className="text-right">
+                  <h2 className="text-xl font-black uppercase tracking-tight mb-1">{t('printInvoice')}</h2>
+                  <p className="text-sm font-bold">#{invoiceId}</p>
+              </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 mb-8">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">{t('customer')}</p>
+                  <p className="text-md font-black">{customer.name}</p>
+                  <p className="text-sm font-bold text-slate-600">{customer.phone}</p>
+                  {customer.address && <p className="text-xs text-slate-500 mt-2 leading-relaxed">{customer.address}</p>}
+              </div>
+              <div className="flex flex-col justify-end text-right space-y-1">
+                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
+                  <p className="text-sm font-bold uppercase">{user.name}</p>
+              </div>
+          </div>
+
+          <div className="mb-8">
+              <table className="w-full text-left">
+                  <thead>
+                      <tr className="border-b-2 border-slate-900 bg-slate-50">
+                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest">{t('item')}</th>
+                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
+                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
+                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-right">{t('price')}</th>
+                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
+                      </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                      {billItems.map((item, idx) => (
+                          <tr key={idx} className="text-sm font-bold">
+                              <td className="py-4 px-2 uppercase">{item.productName}</td>
+                              <td className="py-4 px-2 text-center">{item.quantity}</td>
+                              <td className="py-4 px-2 text-center uppercase">{item.unit}</td>
+                              <td className="py-4 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
+                              <td className="py-4 px-2 text-right">
+                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                              </td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+          </div>
+
+          <div className="flex justify-end pt-6 border-t-2 border-slate-900">
+              <div className="w-64 space-y-3">
+                  <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                      <span>{t('totalSales')}</span>
+                      <span>₹{totals.totalNew.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                      <span>{t('totalScrapBuy')}</span>
+                      <span>-₹{totals.totalWaste.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm font-black border-t border-slate-100 pt-2">
+                      <span className="uppercase tracking-widest">{t('subtotal')}</span>
+                      <span>₹{totals.subtotal.toFixed(2)}</span>
+                  </div>
+                  {gstEnabled && (
+                      <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                          <span>{t('taxes')}</span>
+                          <span>₹{totals.tax.toFixed(2)}</span>
+                      </div>
+                  )}
+                  {shippingEnabled && (
+                      <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                          <span>{t('shippingLogistics')}</span>
+                          <span>₹{totals.logistics.toFixed(2)}</span>
+                      </div>
+                  )}
+                  <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-3 mt-4">
+                      <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
+                      <span>₹{totals.net.toFixed(2)}</span>
+                  </div>
+              </div>
+          </div>
+
+          <div className="mt-20 pt-8 border-t border-slate-100 text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Thank you for choosing PlastiCore</p>
+          </div>
+      </div>
+
       <style>{`
           @media print {
-              .no-print {
-                  display: none !important;
-              }
               body * {
-                  visibility: hidden;
+                  visibility: hidden !important;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
               }
-              .flex-1.p-10.space-y-8, .flex-1.p-10.space-y-8 * {
+              #printable-invoice, #printable-invoice * {
                   visibility: visible !important;
               }
-              .flex-1.p-10.space-y-8 {
+              #printable-invoice {
                   position: absolute !important;
                   left: 0 !important;
                   top: 0 !important;
                   width: 100% !important;
+                  display: block !important;
                   padding: 40px !important;
-                  border: none !important;
-                  background: white !important;
               }
-              .fixed, .w-96, .p-2.bg-white, .opacity-0, button, select, input, .no-print {
+              .no-print, .fixed, button, select, input {
                   display: none !important;
-              }
-              select, input {
-                  border: none !important;
-                  background: none !important;
-                  appearance: none !important;
-                  visibility: visible !important;
-                  color: black !important;
-                  font-weight: bold !important;
-              }
-              .bg-slate-50 {
-                  background-color: transparent !important;
-                  border-bottom: 1px solid #eee !important;
-              }
-              .rounded-3xl, .rounded-2xl {
-                  border-radius: 0 !important;
-                  border: none !important;
-                  box-shadow: none !important;
-              }
-              h3, h4, p, span {
-                  color: #000 !important;
-              }
-              .text-red-600, .text-amber-600 {
-                  color: #000 !important;
-                  font-weight: bold !important;
-              }
-              table {
-                  border-collapse: collapse !important;
-                  width: 100% !important;
-              }
-              th {
-                  border-bottom: 2px solid #000 !important;
-                  color: #000 !important;
-              }
-              td {
-                  border-bottom: 1px solid #eee !important;
-                  color: #000 !important;
-              }
-              .shadow-sm, .shadow-lg, .shadow-2xl {
-                  box-shadow: none !important;
               }
           }
       `}</style>

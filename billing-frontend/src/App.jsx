@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
 import NotificationBell from './components/NotificationBell';
 import BillingPage from './pages/BillingPage';
+import { LogOut } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import InventoryPage from './pages/InventoryPage';
 import StorePage from './pages/StorePage';
@@ -18,7 +19,7 @@ import './i18n/config';
 import { useTranslation } from 'react-i18next';
 
 const MainLayout = ({ children }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useTranslation();
   if (!user) return <Navigate to="/login" />;
   const isManager = user.role === 'manager';
@@ -39,13 +40,34 @@ const MainLayout = ({ children }) => {
              window.location.pathname === '/users' ? t('users') : 'PlastiCore'}
           </h2>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-4">
            <NotificationBell />
+           {isManager && (
+             <button onClick={logout} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
+               <LogOut size={20} />
+             </button>
+           )}
         </div>
       </div>
 
       {!isManager && <div className="hidden md:block"><Sidebar /></div>}
-      <main className={`flex-1 min-h-screen pb-24 md:pb-0 ${isManager ? 'md:ml-0' : 'md:ml-20'}`}>
+
+      {isManager && (
+        <div className="hidden md:flex flex-col w-20 bg-slate-900 border-r border-slate-800 fixed left-0 top-0 h-full z-50 py-6 items-center justify-between">
+           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/20">
+              <span className="text-white font-black text-xl italic">P</span>
+           </div>
+           <button
+             onClick={logout}
+             className="p-3 bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white rounded-xl transition-all mb-4"
+             title={t('logout')}
+           >
+             <LogOut size={22} />
+           </button>
+        </div>
+      )}
+
+      <main className={`flex-1 min-h-screen pb-24 md:pb-0 ${isManager ? 'md:ml-20' : 'md:ml-20'}`}>
         {children}
       </main>
 
