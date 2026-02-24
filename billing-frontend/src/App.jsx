@@ -30,14 +30,14 @@ const MainLayout = ({ children }) => {
       <div className="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 sticky top-0 z-[90]">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20">
-            <span className="text-white font-black text-xl italic">P</span>
+            <span className="text-white font-black text-xl italic">R</span>
           </div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">
             {window.location.pathname === '/' ? t('dashboard') :
              window.location.pathname === '/billing' ? t('billing') :
              window.location.pathname === '/inventory' ? t('products') :
              window.location.pathname === '/stores' ? t('stores') :
-             window.location.pathname === '/users' ? t('users') : 'PlastiCore'}
+             window.location.pathname === '/users' ? t('users') : 'RTS Plastics'}
           </h2>
         </div>
         <div className="flex items-center space-x-4">
@@ -55,7 +55,7 @@ const MainLayout = ({ children }) => {
       {isManager && (
         <div className="hidden md:flex flex-col w-20 bg-slate-900 border-r border-slate-800 fixed left-0 top-0 h-full z-50 py-6 items-center justify-between">
            <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/20">
-              <span className="text-white font-black text-xl italic">P</span>
+              <span className="text-white font-black text-xl italic">R</span>
            </div>
            <button
              onClick={logout}
@@ -82,7 +82,7 @@ const Login = () => {
   const { t } = useTranslation();
   const { login, user, loading } = useAuth();
   if (user) return <Navigate to="/" />;
-  const [formData, setFormData] = React.useState({ email: 'admin@plastic-corp.com', password: 'password123' });
+  const [formData, setFormData] = React.useState({ email: 'admin@rts-plastics.com', password: 'password123' });
   const [view, setView] = React.useState('login'); // 'login' or 'forgot'
   const [resetData, setResetData] = React.useState({ email: '', newPassword: '' });
 
@@ -122,9 +122,9 @@ const Login = () => {
       <div className="w-full max-w-lg p-1 space-y-8 z-10">
         <div className="flex flex-col items-center mb-8">
             <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-500/40 mb-4">
-                <span className="text-white text-3xl font-extrabold italic">P</span>
+                <span className="text-white text-3xl font-extrabold italic">R</span>
             </div>
-            <h1 className="text-[var(--text-primary)] text-3xl font-bold tracking-tight">Plasti<span className="text-red-500">Core</span></h1>
+            <h1 className="text-[var(--text-primary)] text-3xl font-bold tracking-tight">RTS <span className="text-red-500">Plastics</span></h1>
         </div>
 
         <div className="glass-card p-10 bg-white border-white/5 shadow-2xl">
@@ -142,7 +142,7 @@ const Login = () => {
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-red-500 transition-colors" size={18} />
                         <input
                         type="email"
-                        placeholder="admin@plastic-corp.com"
+                        placeholder="admin@rts-plastics.com"
                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40 transition-all font-medium"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}

@@ -620,7 +620,7 @@ const BillingPage = () => {
       <div id="printable-invoice" className="hidden print:block p-8 bg-white text-black font-sans">
           <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-6">
               <div>
-                  <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">PlastiCore</h1>
+                  <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">RTS Plastics</h1>
                   <p className="text-sm font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
                   <p className="text-xs text-slate-500 mt-1 italic">{new Date().toLocaleString()}</p>
               </div>
@@ -704,7 +704,7 @@ const BillingPage = () => {
           </div>
 
           <div className="mt-20 pt-8 border-t border-slate-100 text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Thank you for choosing PlastiCore</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
           </div>
       </div>
 

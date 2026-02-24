@@ -51,7 +51,7 @@ const Sidebar = () => {
       <div className="p-5 flex justify-center">
         <div className="flex items-center">
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/20 shrink-0">
-            <span className="text-white font-black text-xl italic">P</span>
+            <span className="text-white font-black text-xl italic">R</span>
           </div>
         </div>
       </div>
