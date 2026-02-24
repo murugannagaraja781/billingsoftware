@@ -29,8 +29,8 @@ const MainLayout = ({ children }) => {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 sticky top-0 z-[90]">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20">
-            <span className="text-white font-black text-xl italic">R</span>
+          <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/5 overflow-hidden">
+            <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-cover" />
           </div>
           <h2 className="text-xl font-black text-slate-900 tracking-tight">
             {window.location.pathname === '/' ? t('dashboard') :
@@ -54,8 +54,8 @@ const MainLayout = ({ children }) => {
 
       {isManager && (
         <div className="hidden md:flex flex-col w-20 bg-slate-900 border-r border-slate-800 fixed left-0 top-0 h-full z-50 py-6 items-center justify-between">
-           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/20">
-              <span className="text-white font-black text-xl italic">R</span>
+           <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-black/10 overflow-hidden">
+              <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-cover" />
            </div>
            <button
              onClick={logout}
@@ -121,8 +121,8 @@ const Login = () => {
 
       <div className="w-full max-w-lg p-1 space-y-8 z-10">
         <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-500/40 mb-4">
-                <span className="text-white text-3xl font-extrabold italic">R</span>
+            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl shadow-black/5 mb-4 overflow-hidden p-2 border border-slate-100">
+                <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-[var(--text-primary)] text-3xl font-bold tracking-tight">RTS <span className="text-red-500">Plastics</span></h1>
         </div>

@@ -22,6 +22,7 @@ const transactionSchema = new mongoose.Schema({
         default: 'paid'
     },
     paymentMethod: { type: String, default: 'cash' },
+    invoiceId: { type: String, unique: true },
     storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store' },
     managedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     date: { type: Date, default: Date.now },

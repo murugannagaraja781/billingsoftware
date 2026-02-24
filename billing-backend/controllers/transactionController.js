@@ -2,7 +2,7 @@ const Transaction = require('../models/Transaction');
 const Product = require('../models/Product');
 
 const createTransaction = async (req, res) => {
-    const { customerName, customerPhone, items, paymentMethod, storeId } = req.body;
+    const { customerName, customerPhone, items, paymentMethod, storeId, invoiceId } = req.body;
 
     try {
         let totalNewAmount = 0;
@@ -28,6 +28,7 @@ const createTransaction = async (req, res) => {
             totalWasteAmount,
             netAmount,
             paymentMethod,
+            invoiceId,
             storeId,
             managedBy: req.user._id,
         });
@@ -66,13 +67,31 @@ const createTransaction = async (req, res) => {
     }
 };
 
-const getTransactions = async (req, res) => {
+const deleteTransaction = async (req, res) => {
     try {
-        const transactions = await Transaction.find({}).populate('managedBy', 'name').sort({ createdAt: -1 });
-        res.json(transactions);
+        const transaction = await Transaction.findById(req.params.id);
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+
+        // Revert stock changes
+        for (const item of transaction.items) {
+            const product = await Product.findById(item.productId);
+            if (product) {
+                if (item.type === 'sold') {
+                    product.stock += item.quantity; // Sold item, so add it back
+                } else {
+                    product.stock -= item.quantity; // Bought item, so remove it
+                }
+                await product.save();
+            }
+        }
+
+        await transaction.deleteOne();
+        res.json({ message: 'Transaction deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = { createTransaction, getTransactions };
+module.exports = { createTransaction, getTransactions, deleteTransaction };

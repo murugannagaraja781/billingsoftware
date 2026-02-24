@@ -619,10 +619,15 @@ const BillingPage = () => {
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
       <div id="printable-invoice" className="hidden print:block p-8 bg-white text-black font-sans">
           <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-6">
-              <div>
-                  <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">RTS Plastics</h1>
-                  <p className="text-sm font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
-                  <p className="text-xs text-slate-500 mt-1 italic">{new Date().toLocaleString()}</p>
+              <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-white overflow-hidden">
+                      <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-contain" />
+                  </div>
+                  <div>
+                      <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">RTS Plastics</h1>
+                      <p className="text-sm font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
+                      <p className="text-xs text-slate-500 mt-1 italic">{new Date().toLocaleString()}</p>
+                  </div>
               </div>
               <div className="text-right">
                   <h2 className="text-xl font-black uppercase tracking-tight mb-1">{t('printInvoice')}</h2>

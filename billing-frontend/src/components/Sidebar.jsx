@@ -50,8 +50,8 @@ const Sidebar = () => {
     <div className="group h-screen w-20 hover:w-64 bg-slate-900 border-r border-slate-800 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 ease-in-out shadow-2xl overflow-hidden">
       <div className="p-5 flex justify-center">
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/20 shrink-0">
-            <span className="text-white font-black text-xl italic">R</span>
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-black/10 overflow-hidden">
+            <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>

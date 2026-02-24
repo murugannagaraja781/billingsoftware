@@ -11,6 +11,7 @@ import {
   Search,
   Bell,
   Download,
+  Trash2,
   Calendar
 } from 'lucide-react';
 import axios from 'axios';
@@ -22,22 +23,36 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+
+  const fetchTransactions = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/api/transactions`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      setTransactions(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const { data } = await axios.get(`${API_URL}/api/transactions`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        setTransactions(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTransactions();
   }, [user.token]);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this bill?')) return;
+    try {
+      await axios.delete(`${API_URL}/api/transactions/${id}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      fetchTransactions();
+    } catch (error) {
+      alert('Error deleting transaction');
+    }
+  };
 
   const totalSales = (transactions || []).reduce((sum, tx) => sum + (tx.totalNewAmount || 0), 0);
   const totalWaste = (transactions || []).reduce((sum, tx) => sum + (tx.totalWasteAmount || 0), 0);
@@ -221,25 +236,99 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold text-white mb-8">{t('recentActivity')}</h3>
             <div className="space-y-6">
                 {recentActivity.map((act) => (
-                    <div key={act.id} className="flex items-start space-x-4 group cursor-pointer">
+                    <div key={act.id} className="flex items-start space-x-4 group">
                         <div className={`mt-1 p-2 rounded-xl bg-${act.color}-500/10 text-${act.color}-500 group-hover:bg-${act.color}-500/20 transition-colors`}>
                             <Activity size={16} />
                         </div>
-                        <div className="flex-1 pb-4 border-b border-slate-100 last:border-0">
-                            <h4 className="text-[13px] font-bold text-[var(--text-primary)] group-hover:text-red-500 transition-colors">{act.title}</h4>
-                            <p className="text-[12px] text-slate-500 mt-0.5">{act.desc}</p>
-                            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-2 leading-none">{act.time}</p>
+                        <div className="flex-1 pb-4 border-b border-slate-100 last:border-0 relative">
+                            <h4 className="text-[13px] font-bold text-[var(--text-primary)] group-hover:text-red-500 transition-colors uppercase">{act.title}</h4>
+                            <p className="text-[12px] text-slate-500 mt-0.5 font-medium">{act.desc}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 leading-none">{act.time}</p>
+
+                            {(user.role === 'admin' || user.role === 'super_admin') && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(act.id); }}
+                                    className="absolute right-0 top-0 p-2 text-slate-300 hover:text-red-500 transition-colors"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
-            <button className="w-full mt-6 py-3 bg-slate-900/50 hover:bg-slate-900 border border-white/5 rounded-2xl text-[11px] font-bold text-slate-400 uppercase tracking-widest transition-all">
+            <button
+                onClick={() => setShowAllTransactions(true)}
+                className="w-full mt-6 py-3 bg-slate-900/50 hover:bg-slate-900 border border-white/5 rounded-2xl text-[11px] font-bold text-slate-400 uppercase tracking-widest transition-all"
+            >
                 {t('viewAllActivity')}
             </button>
         </div>
       </div>
+
+      {/* Full Transaction History Modal */}
+      {showAllTransactions && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4">
+            <div className="w-full max-w-4xl bg-white rounded-[32px] p-8 md:p-12 relative shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+                <button
+                    onClick={() => setShowAllTransactions(false)}
+                    className="absolute top-8 right-8 text-slate-400 hover:text-red-500 transition-colors"
+                >
+                    <XIcon size={24} />
+                </button>
+                <div className="mb-8">
+                    <h3 className="text-3xl font-black text-slate-900 tracking-tight">{t('billingHistory') || 'Billing History'}</h3>
+                    <p className="text-slate-500 font-medium">{t('billingHistoryDesc') || 'Manage and view all generated invoices'}</p>
+                </div>
+
+                <div className="space-y-4">
+                    {transactions.map((tx) => (
+                        <div key={tx._id} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 group">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400">
+                                    <Activity size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-slate-900 uppercase tracking-tight">{tx.customerName}</h4>
+                                    <div className="flex items-center space-x-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                        <span>#{tx.invoiceId}</span>
+                                        <span>•</span>
+                                        <span>{new Date(tx.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center space-x-8 w-full md:w-auto justify-between md:justify-end">
+                                <div className="text-right">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{t('netAmount')}</p>
+                                    <p className="text-lg font-black text-slate-900">₹{tx.netAmount.toLocaleString()}</p>
+                                </div>
+
+                                {(user.role === 'admin' || user.role === 'super_admin') && (
+                                    <button
+                                        onClick={() => handleDelete(tx._id)}
+                                        className="p-3 bg-white hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-xl border border-slate-100 transition-all shadow-sm"
+                                        title={t('delete')}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const XIcon = ({ size }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+);
 
 export default Dashboard;
