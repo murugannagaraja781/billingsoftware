@@ -65,4 +65,16 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
+
+    // Self-ping to keep Render awake (Optional)
+    const url = `https://billingsoftware-vmoo.onrender.com`;
+    if (url.includes('onrender')) {
+        setInterval(() => {
+            http.get(url, (res) => {
+                console.log('Self-ping to stay awake...');
+            }).on('error', (err) => {
+                console.error('Self-ping error:', err.message);
+            });
+        }, 840000); // Every 14 minutes
+    }
 });

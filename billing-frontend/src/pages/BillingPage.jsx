@@ -31,7 +31,7 @@ const BillingPage = () => {
   const [customers, setCustomers] = useState([]);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showNewCustModal, setShowNewCustModal] = useState(false);
-  const [newCustForm, setNewCustForm] = useState({ name: '', phone: '', address: '', gstNumber: '' });
+  const [newCustForm, setNewCustForm] = useState({ name: '', phone: '9876543210', address: '', gstNumber: '' });
   const [billItems, setBillItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -79,7 +79,7 @@ const BillingPage = () => {
       setCustomers([...customers, data]);
       setCustomer(data);
       setShowNewCustModal(false);
-      setNewCustForm({ name: '', phone: '', address: '', gstNumber: '' });
+      setNewCustForm({ name: '', phone: '9876543210', address: '', gstNumber: '' });
     } catch (error) {
       alert(error.response?.data?.message || 'Error creating customer');
     }
@@ -616,56 +616,56 @@ const BillingPage = () => {
       )}
 
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
-      <div id="printable-invoice" className="hidden print:block p-8 bg-white text-black font-sans">
-          <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-6">
+      <div id="printable-invoice" className={`hidden print:block bg-white text-black font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}>
+          <div className="flex justify-between items-start mb-4 border-b-2 border-black pb-4">
               <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-white overflow-hidden">
-                      <img src="/logo.png" alt="RTS Plastics Logo" className="w-full h-full object-contain" />
+                  <div className="w-12 h-12 bg-white overflow-hidden">
+                      <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                      <h1 className="text-3xl font-black uppercase tracking-tighter mb-1">RTS Plastics</h1>
-                      <p className="text-sm font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
-                      <p className="text-xs text-slate-500 mt-1 italic">{new Date().toLocaleString()}</p>
+                      <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
+                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
+                      <p className="text-[9px] text-slate-500 italic">{new Date().toLocaleString()}</p>
                   </div>
               </div>
               <div className="text-right">
-                  <h2 className="text-xl font-black uppercase tracking-tight mb-1">{t('printInvoice')}</h2>
-                  <p className="text-sm font-bold">#{invoiceId}</p>
+                  <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
+                  <p className="text-xs font-bold">#{invoiceId}</p>
               </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 mb-8">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                  <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">{t('customer')}</p>
-                  <p className="text-md font-black">{customer.name}</p>
-                  <p className="text-sm font-bold text-slate-600">{customer.phone}</p>
-                  {customer.address && <p className="text-xs text-slate-500 mt-2 leading-relaxed">{customer.address}</p>}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                  <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
+                  <p className="text-sm font-black">{customer.name}</p>
+                  <p className="text-xs font-bold text-slate-600">{customer.phone}</p>
+                  {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight">{customer.address}</p>}
               </div>
               <div className="flex flex-col justify-end text-right space-y-1">
-                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
-                  <p className="text-sm font-bold uppercase">{user.name}</p>
+                  <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
+                  <p className="text-xs font-bold uppercase">{user.name}</p>
               </div>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-4">
               <table className="w-full text-left">
                   <thead>
                       <tr className="border-b-2 border-slate-900 bg-slate-50">
-                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest">{t('item')}</th>
-                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
-                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
-                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-right">{t('price')}</th>
-                          <th className="py-3 px-2 text-[10px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
+                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
+                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
+                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
+                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
+                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
                       </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                       {billItems.map((item, idx) => (
-                          <tr key={idx} className="text-sm font-bold">
-                              <td className="py-4 px-2 uppercase">{item.productName}</td>
-                              <td className="py-4 px-2 text-center">{item.quantity}</td>
-                              <td className="py-4 px-2 text-center uppercase">{item.unit}</td>
-                              <td className="py-4 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
-                              <td className="py-4 px-2 text-right">
+                          <tr key={idx} className="text-[11px] font-bold border-b border-slate-50">
+                              <td className="py-2 px-2 uppercase">{item.productName}</td>
+                              <td className="py-2 px-2 text-center">{item.quantity}</td>
+                              <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
+                              <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
+                              <td className="py-2 px-2 text-right">
                                   {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
                               </td>
                           </tr>
@@ -674,46 +674,50 @@ const BillingPage = () => {
               </table>
           </div>
 
-          <div className="flex justify-end pt-6 border-t-2 border-slate-900">
-              <div className="w-64 space-y-3">
-                  <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+          <div className="flex justify-end pt-4 border-t-2 border-slate-900">
+              <div className="w-56 space-y-2">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
                       <span>{t('totalSales')}</span>
                       <span>₹{totals.totalNew.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
                       <span>{t('totalScrapBuy')}</span>
                       <span>-₹{totals.totalWaste.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm font-black border-t border-slate-100 pt-2">
+                  <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1">
                       <span className="uppercase tracking-widest">{t('subtotal')}</span>
                       <span>₹{totals.subtotal.toFixed(2)}</span>
                   </div>
                   {gstEnabled && (
-                      <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
                           <span>{t('taxes')}</span>
                           <span>₹{totals.tax.toFixed(2)}</span>
                       </div>
                   )}
                   {shippingEnabled && (
-                      <div className="flex justify-between items-center text-xs font-bold uppercase text-slate-500">
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
                           <span>{t('shippingLogistics')}</span>
                           <span>₹{totals.logistics.toFixed(2)}</span>
                       </div>
                   )}
-                  <div className="flex justify-between items-center text-lg font-black border-t-2 border-black pt-3 mt-4">
+                  <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2">
                       <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
                       <span>₹{totals.net.toFixed(2)}</span>
                   </div>
               </div>
           </div>
 
-          <div className="mt-20 pt-8 border-t border-slate-100 text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
+          <div className="mt-10 pt-4 border-t border-slate-100 text-center">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
           </div>
       </div>
 
       <style>{`
           @media print {
+              @page {
+                  size: portrait;
+                  margin: 10mm;
+              }
               body * {
                   visibility: hidden !important;
                   -webkit-print-color-adjust: exact !important;
@@ -728,7 +732,21 @@ const BillingPage = () => {
                   top: 0 !important;
                   width: 100% !important;
                   display: block !important;
-                  padding: 40px !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+              }
+              .print-compact {
+                  font-size: 9px !important;
+              }
+              .print-compact td, .print-compact th {
+                  padding-top: 3px !important;
+                  padding-bottom: 3px !important;
+              }
+              .print-compact .mb-4 {
+                  margin-bottom: 8px !important;
+              }
+              .print-compact .mt-10 {
+                  margin-top: 20px !important;
               }
               .no-print, .fixed, button, select, input {
                   display: none !important;
