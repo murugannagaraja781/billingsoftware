@@ -715,8 +715,8 @@ const BillingPage = () => {
       <style>{`
           @media print {
               @page {
-                  size: portrait;
-                  margin: 10mm;
+                  size: A5;
+                  margin: 5mm;
               }
               body * {
                   visibility: hidden !important;
