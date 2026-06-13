@@ -204,6 +204,174 @@ const BillingPage = () => {
     // Optionally regenerate invoice ID here if needed
   };
 
+  const getPrintConfig = () => {
+    const len = billItems.length;
+    let cols = 1;
+    let fontSize = '11px';
+    let thFontSize = '9px';
+    let paddingY = '8px';
+    let paddingX = '8px';
+    let headerMb = '16px';
+    let headerPb = '16px';
+    let infoGridMb = '16px';
+    let tableMb = '16px';
+    let customerCardPadding = '12px';
+    let showLogo = true;
+    let logoSize = '48px';
+    let footerMt = '40px';
+    let totalsContainerWidth = '224px';
+    let totalsRowSpacing = '8px';
+    let thinBorders = false;
+    let headerTitleSize = '24px';
+    let subtitleSize = '14px';
+
+    if (len > 500) {
+      cols = 6;
+      fontSize = '4.2px';
+      thFontSize = '3.8px';
+      paddingY = '0.5px';
+      paddingX = '1px';
+      headerMb = '2px';
+      headerPb = '2px';
+      infoGridMb = '2px';
+      tableMb = '2px';
+      customerCardPadding = '2px';
+      showLogo = false;
+      footerMt = '4px';
+      totalsContainerWidth = '140px';
+      totalsRowSpacing = '1px';
+      thinBorders = true;
+      headerTitleSize = '11px';
+      subtitleSize = '8px';
+    } else if (len > 250) {
+      cols = 5;
+      fontSize = '5.5px';
+      thFontSize = '5.0px';
+      paddingY = '1px';
+      paddingX = '2px';
+      headerMb = '4px';
+      headerPb = '4px';
+      infoGridMb = '4px';
+      tableMb = '4px';
+      customerCardPadding = '4px';
+      showLogo = false;
+      footerMt = '8px';
+      totalsContainerWidth = '160px';
+      totalsRowSpacing = '2px';
+      thinBorders = true;
+      headerTitleSize = '13px';
+      subtitleSize = '9px';
+    } else if (len > 120) {
+      cols = 4;
+      fontSize = '6.8px';
+      thFontSize = '6.2px';
+      paddingY = '1.5px';
+      paddingX = '3px';
+      headerMb = '6px';
+      headerPb = '6px';
+      infoGridMb = '6px';
+      tableMb = '6px';
+      customerCardPadding = '6px';
+      showLogo = false;
+      footerMt = '12px';
+      totalsContainerWidth = '180px';
+      totalsRowSpacing = '3px';
+      thinBorders = true;
+      headerTitleSize = '15px';
+      subtitleSize = '10px';
+    } else if (len > 50) {
+      cols = 3;
+      fontSize = '8.5px';
+      thFontSize = '8.0px';
+      paddingY = '2px';
+      paddingX = '4px';
+      headerMb = '8px';
+      headerPb = '8px';
+      infoGridMb = '8px';
+      tableMb = '8px';
+      customerCardPadding = '8px';
+      showLogo = false;
+      footerMt = '16px';
+      totalsContainerWidth = '200px';
+      totalsRowSpacing = '4px';
+      thinBorders = true;
+      headerTitleSize = '18px';
+      subtitleSize = '11px';
+    } else if (len > 15) {
+      cols = 2;
+      fontSize = '10.0px';
+      thFontSize = '9.0px';
+      paddingY = '3.5px';
+      paddingX = '5px';
+      headerMb = '12px';
+      headerPb = '12px';
+      infoGridMb = '12px';
+      tableMb = '12px';
+      customerCardPadding = '10px';
+      showLogo = true;
+      logoSize = '32px';
+      footerMt = '24px';
+      totalsContainerWidth = '220px';
+      totalsRowSpacing = '6px';
+      thinBorders = false;
+      headerTitleSize = '22px';
+      subtitleSize = '12px';
+    } else {
+      cols = 1;
+      fontSize = '12px';
+      thFontSize = '10px';
+      paddingY = '6px';
+      paddingX = '8px';
+      headerMb = '16px';
+      headerPb = '16px';
+      infoGridMb = '16px';
+      tableMb = '16px';
+      customerCardPadding = '12px';
+      showLogo = true;
+      logoSize = '44px';
+      footerMt = '32px';
+      totalsContainerWidth = '224px';
+      totalsRowSpacing = '8px';
+      thinBorders = false;
+      headerTitleSize = '24px';
+      subtitleSize = '14px';
+    }
+
+    return {
+      cols,
+      fontSize,
+      thFontSize,
+      paddingY,
+      paddingX,
+      headerMb,
+      headerPb,
+      infoGridMb,
+      tableMb,
+      customerCardPadding,
+      showLogo,
+      logoSize,
+      footerMt,
+      totalsContainerWidth,
+      totalsRowSpacing,
+      thinBorders,
+      headerTitleSize,
+      subtitleSize
+    };
+  };
+
+  const chunkArray = (arr, numChunks) => {
+    if (numChunks <= 1) return [arr];
+    const chunks = [];
+    const itemsPerChunk = Math.ceil(arr.length / numChunks);
+    for (let i = 0; i < numChunks; i++) {
+      const chunk = arr.slice(i * itemsPerChunk, (i + 1) * itemsPerChunk);
+      if (chunk.length > 0) {
+        chunks.push(chunk);
+      }
+    }
+    return chunks;
+  };
+
   const getA4CompactClass = () => {
     const len = billItems.length;
     if (len > 75) return 'a4-nano-compact';
@@ -652,103 +820,173 @@ const BillingPage = () => {
 
 
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
-      <div id="printable-invoice" className={`hidden print:block bg-white text-black font-sans ${getA4CompactClass()}`}>
-          <div className="p-6 invoice-container">
-              <div className="invoice-header flex justify-between items-start mb-4 border-b-2 border-slate-900 pb-4">
-                  <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-white overflow-hidden logo-wrapper">
-                          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                      </div>
-                      <div>
-                          <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
-                          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle">{user.storeName || t('mainUnit')}</p>
-                          <p className="text-[9px] text-slate-500 italic invoice-date">{new Date().toLocaleString()}</p>
-                      </div>
-                  </div>
-                  <div className="text-right">
-                      <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
-                      <p className="text-xs font-bold invoice-id">#{invoiceId}</p>
-                  </div>
-              </div>
-
-              <div className="invoice-info-grid grid grid-cols-2 gap-4 mb-4">
-                  <div className="customer-card p-3 bg-slate-50 rounded-lg border border-slate-100">
-                      <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
-                      <p className="text-sm font-black customer-name">{customer.name}</p>
-                      <p className="text-xs font-bold text-slate-600 customer-phone">{customer.phone}</p>
-                      {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight customer-address">{customer.address}</p>}
-                  </div>
-                  <div className="billed-by-card flex flex-col justify-end text-right space-y-1">
-                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
-                      <p className="text-xs font-bold uppercase">{user.name}</p>
-                  </div>
-              </div>
-
-              <div className="invoice-table-wrapper mb-4">
-                  <table className="w-full text-left">
-                      <thead>
-                          <tr className="border-b-2 border-slate-900 bg-slate-50 invoice-table-hdr">
-                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
-                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
-                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
-                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
-                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
-                          </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                          {billItems.map((item, idx) => (
-                              <tr key={idx} className="text-[11px] font-bold border-b border-slate-50 invoice-table-row">
-                                  <td className="py-2 px-2 uppercase">{item.productName}</td>
-                                  <td className="py-2 px-2 text-center">{item.quantity}</td>
-                                  <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
-                                  <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
-                                  <td className="py-2 px-2 text-right">
-                                      {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                                  </td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
-              </div>
-
-              <div className="invoice-totals-wrapper flex justify-end pt-4 border-t-2 border-slate-900">
-                  <div className="w-56 space-y-2 totals-container">
-                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 total-row">
-                          <span>{t('totalSales')}</span>
-                          <span>₹{totals.totalNew.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 total-row">
-                          <span>{t('totalScrapBuy')}</span>
-                          <span>-₹{totals.totalWaste.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1 subtotal-row">
-                          <span className="uppercase tracking-widest">{t('subtotal')}</span>
-                          <span>₹{totals.subtotal.toFixed(2)}</span>
-                      </div>
-                      {gstEnabled && (
-                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 gst-row">
-                              <span>{t('taxes')}</span>
-                              <span>₹{totals.tax.toFixed(2)}</span>
+      {(() => {
+          const printConfig = getPrintConfig();
+          const chunkedItems = chunkArray(billItems, printConfig.cols);
+          return (
+              <div 
+                id="printable-invoice" 
+                className={`hidden print:block bg-white text-black font-sans ${getA4CompactClass()}`}
+                style={{ fontSize: printConfig.fontSize }}
+              >
+                  <div className="invoice-container">
+                      <div 
+                        className="invoice-header flex justify-between items-start border-b border-slate-900"
+                        style={{ 
+                          marginBottom: printConfig.headerMb,
+                          paddingBottom: printConfig.headerPb
+                        }}
+                      >
+                          <div className="flex items-center space-x-4">
+                              {printConfig.showLogo && (
+                                  <div className="bg-white overflow-hidden logo-wrapper" style={{ width: printConfig.logoSize, height: printConfig.logoSize }}>
+                                      <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                                  </div>
+                              )}
+                              <div>
+                                  <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>RTS Plastics</h1>
+                                  <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{user.storeName || t('mainUnit')}</p>
+                                  <p className="text-slate-500 italic invoice-date" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)` }}>{new Date().toLocaleString()}</p>
+                              </div>
                           </div>
-                      )}
-                      {shippingEnabled && (
-                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 shipping-row">
-                              <span>{t('shippingLogistics')}</span>
-                              <span>₹{totals.logistics.toFixed(2)}</span>
+                          <div className="text-right">
+                              <h2 className="font-black uppercase tracking-tight" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>{t('printInvoice')}</h2>
+                              <p className="font-bold invoice-id" style={{ fontSize: printConfig.fontSize }}>#{invoiceId}</p>
                           </div>
-                      )}
-                      <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2 net-row">
-                          <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
-                          <span>₹{totals.net.toFixed(2)}</span>
+                      </div>
+
+                      <div 
+                        className="invoice-info-grid grid grid-cols-2 gap-4"
+                        style={{ marginBottom: printConfig.infoGridMb }}
+                      >
+                          <div className="customer-card bg-slate-50 rounded-lg border border-slate-100" style={{ padding: printConfig.customerCardPadding }}>
+                              <p className="font-black uppercase text-slate-400 tracking-widest" style={{ fontSize: `calc(${printConfig.fontSize} * 0.75)`, marginBottom: '2px' }}>{t('customer')}</p>
+                              <p className="font-black customer-name" style={{ fontSize: `calc(${printConfig.fontSize} * 1.15)` }}>{customer.name}</p>
+                              <p className="font-bold text-slate-600 customer-phone" style={{ fontSize: printConfig.fontSize }}>{customer.phone}</p>
+                              {customer.address && <p className="text-slate-500 leading-tight customer-address" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)`, marginTop: '2px' }}>{customer.address}</p>}
+                          </div>
+                          <div className="billed-by-card flex flex-col justify-end text-right space-y-1">
+                              <p className="font-black uppercase text-slate-400 tracking-widest" style={{ fontSize: `calc(${printConfig.fontSize} * 0.75)` }}>{t('billedBy') || 'Billed By'}</p>
+                              <p className="font-bold uppercase" style={{ fontSize: printConfig.fontSize }}>{user.name}</p>
+                          </div>
+                      </div>
+
+                      <div className="invoice-table-wrapper" style={{ marginBottom: printConfig.tableMb }}>
+                          <div className="flex gap-4 w-full items-start">
+                              {chunkedItems.map((chunk, colIdx) => (
+                                  <div key={colIdx} className="flex-1">
+                                      <table className="w-full text-left">
+                                          <thead>
+                                              <tr className="border-b border-slate-900 bg-slate-50 invoice-table-hdr">
+                                                  {printConfig.cols === 1 ? (
+                                                      <>
+                                                          <th className="py-1 px-1 font-black uppercase tracking-widest" style={{ fontSize: printConfig.thFontSize }}>{t('item')}</th>
+                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('qty')}</th>
+                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('unit')}</th>
+                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('price')}</th>
+                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('subtotalTable')}</th>
+                                                      </>
+                                                  ) : (
+                                                      <>
+                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest" style={{ fontSize: printConfig.thFontSize }}>{t('item')}</th>
+                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('qty')}</th>
+                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('subtotalTable')}</th>
+                                                      </>
+                                                  )}
+                                              </tr>
+                                          </thead>
+                                          <tbody className="divide-y divide-slate-100">
+                                              {chunk.map((item, idx) => (
+                                                  <tr key={idx} className="font-bold border-b border-slate-50 invoice-table-row">
+                                                      {printConfig.cols === 1 ? (
+                                                          <>
+                                                              <td className="uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.productName}</td>
+                                                              <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
+                                                              <td className="text-center uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.unit}</td>
+                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>₹{item.unitPrice.toFixed(2)}</td>
+                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>
+                                                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                                              </td>
+                                                          </>
+                                                      ) : (
+                                                          <>
+                                                              <td className="uppercase break-words leading-tight" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}`, maxWidth: `${180 / printConfig.cols - 15}mm` }}>{item.productName}</td>
+                                                              <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
+                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>
+                                                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                                              </td>
+                                                          </>
+                                                      )}
+                                                  </tr>
+                                              ))}
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+
+                      <div className="invoice-totals-wrapper flex justify-end pt-2 border-t border-slate-900">
+                          <div className="totals-container" style={{ width: printConfig.totalsContainerWidth }}>
+                              <div 
+                                className="flex justify-between items-center font-bold uppercase text-slate-500 total-row"
+                                style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, marginBottom: printConfig.totalsRowSpacing }}
+                              >
+                                  <span>{t('totalSales')}</span>
+                                  <span>₹{totals.totalNew.toFixed(2)}</span>
+                              </div>
+                              <div 
+                                className="flex justify-between items-center font-bold uppercase text-slate-500 total-row"
+                                style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, marginBottom: printConfig.totalsRowSpacing }}
+                              >
+                                  <span>{t('totalScrapBuy')}</span>
+                                  <span>-₹{totals.totalWaste.toFixed(2)}</span>
+                              </div>
+                              <div 
+                                className="flex justify-between items-center font-black border-t border-slate-100 pt-1 subtotal-row"
+                                style={{ fontSize: printConfig.fontSize, marginBottom: printConfig.totalsRowSpacing }}
+                              >
+                                  <span className="uppercase tracking-widest">{t('subtotal')}</span>
+                                  <span>₹{totals.subtotal.toFixed(2)}</span>
+                              </div>
+                              {gstEnabled && (
+                                  <div 
+                                    className="flex justify-between items-center font-bold uppercase text-slate-500 gst-row"
+                                    style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, marginBottom: printConfig.totalsRowSpacing }}
+                                  >
+                                      <span>{t('taxes')}</span>
+                                      <span>₹{totals.tax.toFixed(2)}</span>
+                                  </div>
+                              )}
+                              {shippingEnabled && (
+                                  <div 
+                                    className="flex justify-between items-center font-bold uppercase text-slate-500 shipping-row"
+                                    style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, marginBottom: printConfig.totalsRowSpacing }}
+                                  >
+                                      <span>{t('shippingLogistics')}</span>
+                                      <span>₹{totals.logistics.toFixed(2)}</span>
+                                  </div>
+                              )}
+                              <div 
+                                className="flex justify-between items-center font-black border-t border-black pt-1 mt-1 net-row"
+                                style={{ fontSize: `calc(${printConfig.fontSize} * 1.35)` }}
+                              >
+                                  <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
+                                  <span>₹{totals.net.toFixed(2)}</span>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div 
+                        className="invoice-footer border-t border-slate-100 text-center"
+                        style={{ marginTop: printConfig.footerMt, paddingTop: `calc(${printConfig.footerMt} * 0.5)` }}
+                      >
+                          <p className="font-black uppercase tracking-[0.2em] text-slate-400 italic" style={{ fontSize: `calc(${printConfig.fontSize} * 0.8)` }}>Thank you for choosing RTS Plastics</p>
                       </div>
                   </div>
               </div>
-
-              <div className="invoice-footer mt-10 pt-4 border-t border-slate-100 text-center">
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
-              </div>
-          </div>
-      </div>
+          );
+      })()}
 
       <style>{`
           @media print {
@@ -760,7 +998,7 @@ const BillingPage = () => {
               }
               @page {
                   size: A4;
-                  margin: 1.2cm !important;
+                  margin: 0.2cm !important;
               }
               body * {
                   visibility: hidden !important;
@@ -784,17 +1022,19 @@ const BillingPage = () => {
                   break-inside: avoid !important;
               }
               
-              /* Remove extra padding around invoice container inside 1.2cm margin */
+              /* Remove extra padding around invoice container inside 0.2cm margin */
               #printable-invoice .invoice-container {
                   padding: 0 !important;
               }
               
               /* Thin borders in print */
-              #printable-invoice border-slate-900,
-              #printable-invoice border-black,
+              #printable-invoice .border-slate-900,
+              #printable-invoice .border-black,
               #printable-invoice .border-b-2,
-              #printable-invoice .border-t-2 {
-                  border-color: #000000 !important;
+              #printable-invoice .border-t-2,
+              #printable-invoice .border-t,
+              #printable-invoice .border-b {
+                  border-color: #e2e8f0 !important;
                   border-width: 1px !important;
               }
 
