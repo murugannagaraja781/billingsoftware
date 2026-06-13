@@ -62,9 +62,9 @@ const BillingPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setCustomers(data);
-      setCustomers(data);
-      if (data.length > 0 && customer.name === t('selectCustomerTitle')) {
-          setCustomer(data[0]);
+      if (data.length > 0 && (customer.name === t('selectCustomerTitle') || customer._id === '')) {
+          const defaultCust = data.find(c => c.name.toLowerCase().includes('thangavel')) || data[0];
+          setCustomer(defaultCust);
       }
     } catch (error) {
       console.error(error);
@@ -150,11 +150,34 @@ const BillingPage = () => {
 
   const handleSubmit = async () => {
     if (!customer.name || billItems.length === 0) return alert(t('fillDetailsError'));
+    
+    // Check if customer is just placeholder and fallback to "Thangavel"
+    let activeCustomer = customer;
+    if (customer.name === t('selectCustomerTitle') || customer._id === '') {
+        const defaultCust = customers.find(c => c.name.toLowerCase().includes('thangavel')) || customers[0];
+        if (defaultCust) {
+            activeCustomer = defaultCust;
+            setCustomer(defaultCust);
+        } else {
+            return alert("Please select a customer first.");
+        }
+    }
+
+    // Check if any product is not selected or quantity is invalid
+    for (const item of billItems) {
+        if (!item.productId) {
+            return alert("Please select a product / material for all rows.");
+        }
+        if (item.quantity <= 0) {
+            return alert(`Please enter a quantity greater than 0 for ${item.productName || 'all items'}.`);
+        }
+    }
+
     setLoading(true);
     try {
       const transactionData = {
-        customerName: customer.name,
-        customerPhone: customer.phone,
+        customerName: activeCustomer.name,
+        customerPhone: activeCustomer.phone,
         items: billItems,
         totalNewAmount: totals.totalNew,
         totalWasteAmount: totals.totalWaste,
@@ -168,7 +191,9 @@ const BillingPage = () => {
       setLastTransaction(transactionData);
       setShowSuccessModal(true);
     } catch (error) {
-      alert(t('errorGeneratingBill'));
+      console.error("Bill generation error:", error);
+      const errMsg = error.response?.data?.message || error.message;
+      alert(`${t('errorGeneratingBill')}: ${errMsg}`);
     } finally {
       setLoading(false);
     }
