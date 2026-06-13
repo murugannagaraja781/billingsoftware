@@ -40,7 +40,6 @@ const BillingPage = () => {
   const [shippingAmount, setShippingAmount] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
-  const [printType, setPrintType] = useState('pos80');
 
   useEffect(() => {
     fetchProducts();
@@ -203,6 +202,15 @@ const BillingPage = () => {
     setBillItems([]);
     setShowSuccessModal(false);
     // Optionally regenerate invoice ID here if needed
+  };
+
+  const getA4CompactClass = () => {
+    const len = billItems.length;
+    if (len > 75) return 'a4-nano-compact';
+    if (len > 50) return 'a4-micro-compact';
+    if (len > 25) return 'a4-ultra-compact';
+    if (len > 10) return 'a4-compact';
+    return '';
   };
 
   return (
@@ -644,210 +652,109 @@ const BillingPage = () => {
 
 
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
-      <div id="printable-invoice" className={`hidden print:block bg-white text-black ${printType.startsWith('pos') ? 'print-pos-layout font-mono' : `font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}`}>
-          {printType.startsWith('pos') ? (
-              <div className={`pos-receipt leading-tight mx-auto p-1.5 ${printType === 'pos58' ? 'max-w-[58mm] text-[9.5px]' : 'max-w-[80mm] text-[11px]'} ${billItems.length > 12 ? 'pos-ultra-compact' : billItems.length > 6 ? 'pos-compact' : ''}`}>
-                  <div className="text-center mb-2">
-                      <h1 className={`${printType === 'pos58' ? 'text-xs' : 'text-sm'} font-black uppercase tracking-tight`}>RTS PLASTICS</h1>
-                      <p className={`${printType === 'pos58' ? 'text-[8px]' : 'text-[9px]'} font-bold uppercase`}>{user.storeName || t('mainUnit')}</p>
-                      <p className={`${printType === 'pos58' ? 'text-[7px]' : 'text-[8px]'} text-slate-500`}>{new Date().toLocaleString()}</p>
-                  </div>
-                  
-                  <div className="border-t border-dashed border-black my-2"></div>
-                  
-                  <div className="space-y-1 mb-2">
-                      <div className="flex justify-between">
-                          <span>Invoice:</span>
-                          <span className="font-bold">#{invoiceId}</span>
+      <div id="printable-invoice" className={`hidden print:block bg-white text-black font-sans ${getA4CompactClass()}`}>
+          <div className="p-6 invoice-container">
+              <div className="invoice-header flex justify-between items-start mb-4 border-b-2 border-slate-900 pb-4">
+                  <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-white overflow-hidden logo-wrapper">
+                          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                       </div>
-                      <div className="flex justify-between">
-                          <span>Customer:</span>
-                          <span className="font-bold">{customer.name}</span>
-                      </div>
-                      {customer.phone && (
-                          <div className="flex justify-between">
-                              <span>Phone:</span>
-                              <span>{customer.phone}</span>
-                          </div>
-                      )}
-                      <div className="flex justify-between">
-                          <span>Billed By:</span>
-                          <span className="uppercase">{user.name}</span>
+                      <div>
+                          <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
+                          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle">{user.storeName || t('mainUnit')}</p>
+                          <p className="text-[9px] text-slate-500 italic invoice-date">{new Date().toLocaleString()}</p>
                       </div>
                   </div>
-                  
-                  <div className="border-t border-dashed border-black my-2"></div>
-                  
-                  {/* Items List */}
-                  <div className="space-y-2 mb-2">
-                      <div className="flex justify-between font-bold">
-                          <span className="w-1/2">Item</span>
-                          <span className="w-1/4 text-center">Qty</span>
-                          <span className="w-1/4 text-right">Total</span>
-                      </div>
-                      <div className="border-t border-dotted border-black my-1"></div>
-                      {billItems.map((item, idx) => (
-                          <div key={idx} className="space-y-0.5">
-                              <div className={`font-bold uppercase ${printType === 'pos58' ? 'text-[8.5px]' : 'text-[10px]'}`}>{item.productName} ({item.type === 'sold' ? 'NEW' : 'SCRAP'})</div>
-                              <div className={`flex justify-between ${printType === 'pos58' ? 'text-[8.5px]' : 'text-[10px]'}`}>
-                                  <span className="text-slate-600 pl-2">
-                                      {item.quantity} {item.unit} x ₹{item.unitPrice.toFixed(2)}
-                                  </span>
-                                  <span className="font-bold">
+                  <div className="text-right">
+                      <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
+                      <p className="text-xs font-bold invoice-id">#{invoiceId}</p>
+                  </div>
+              </div>
+
+              <div className="invoice-info-grid grid grid-cols-2 gap-4 mb-4">
+                  <div className="customer-card p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
+                      <p className="text-sm font-black customer-name">{customer.name}</p>
+                      <p className="text-xs font-bold text-slate-600 customer-phone">{customer.phone}</p>
+                      {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight customer-address">{customer.address}</p>}
+                  </div>
+                  <div className="billed-by-card flex flex-col justify-end text-right space-y-1">
+                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
+                      <p className="text-xs font-bold uppercase">{user.name}</p>
+                  </div>
+              </div>
+
+              <div className="invoice-table-wrapper mb-4">
+                  <table className="w-full text-left">
+                      <thead>
+                          <tr className="border-b-2 border-slate-900 bg-slate-50 invoice-table-hdr">
+                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
+                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
+                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
+                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
+                              <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
+                          </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                          {billItems.map((item, idx) => (
+                              <tr key={idx} className="text-[11px] font-bold border-b border-slate-50 invoice-table-row">
+                                  <td className="py-2 px-2 uppercase">{item.productName}</td>
+                                  <td className="py-2 px-2 text-center">{item.quantity}</td>
+                                  <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
+                                  <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
+                                  <td className="py-2 px-2 text-right">
                                       {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                                  </span>
-                              </div>
-                          </div>
-                      ))}
-                  </div>
-                  
-                  <div className="border-t border-dashed border-black my-2"></div>
-                  
-                  {/* Totals */}
-                  <div className="space-y-1 text-right mb-4">
-                      <div className="flex justify-between">
-                          <span>Total Sales:</span>
+                                  </td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
+              </div>
+
+              <div className="invoice-totals-wrapper flex justify-end pt-4 border-t-2 border-slate-900">
+                  <div className="w-56 space-y-2 totals-container">
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 total-row">
+                          <span>{t('totalSales')}</span>
                           <span>₹{totals.totalNew.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between">
-                          <span>Total Scrap Buy:</span>
+                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 total-row">
+                          <span>{t('totalScrapBuy')}</span>
                           <span>-₹{totals.totalWaste.toFixed(2)}</span>
                       </div>
-                      <div className="border-t border-dotted border-black my-1"></div>
-                      <div className="flex justify-between font-bold">
-                          <span>Subtotal:</span>
+                      <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1 subtotal-row">
+                          <span className="uppercase tracking-widest">{t('subtotal')}</span>
                           <span>₹{totals.subtotal.toFixed(2)}</span>
                       </div>
                       {gstEnabled && (
-                          <div className="flex justify-between">
-                              <span>GST (18%):</span>
+                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 gst-row">
+                              <span>{t('taxes')}</span>
                               <span>₹{totals.tax.toFixed(2)}</span>
                           </div>
                       )}
                       {shippingEnabled && (
-                          <div className="flex justify-between">
-                              <span>Shipping:</span>
+                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500 shipping-row">
+                              <span>{t('shippingLogistics')}</span>
                               <span>₹{totals.logistics.toFixed(2)}</span>
                           </div>
                       )}
-                      <div className="border-t border-dashed border-black my-1"></div>
-                      <div className={`flex justify-between ${printType === 'pos58' ? 'text-[11px]' : 'text-xs'} font-black uppercase pt-1`}>
-                          <span>Net Receivable:</span>
+                      <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2 net-row">
+                          <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
                           <span>₹{totals.net.toFixed(2)}</span>
                       </div>
                   </div>
-                  
-                  <div className="border-t border-dashed border-black my-2"></div>
-                  
-                  <div className={`text-center italic mt-2 ${printType === 'pos58' ? 'text-[8px]' : 'text-[9px]'}`}>
-                      <p>Thank you for choosing RTS Plastics!</p>
-                      <p className="text-[7px] text-slate-500 mt-1">Generated by PlastiCore Billing</p>
-                  </div>
               </div>
-          ) : (
-              <div className="p-6">
-                  <div className="flex justify-between items-start mb-4 border-b-2 border-black pb-4">
-                      <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-white overflow-hidden">
-                              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                          </div>
-                          <div>
-                              <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
-                              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
-                              <p className="text-[9px] text-slate-500 italic">{new Date().toLocaleString()}</p>
-                          </div>
-                      </div>
-                      <div className="text-right">
-                          <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
-                          <p className="text-xs font-bold">#{invoiceId}</p>
-                      </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                          <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
-                          <p className="text-sm font-black">{customer.name}</p>
-                          <p className="text-xs font-bold text-slate-600">{customer.phone}</p>
-                          {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight">{customer.address}</p>}
-                      </div>
-                      <div className="flex flex-col justify-end text-right space-y-1">
-                          <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
-                          <p className="text-xs font-bold uppercase">{user.name}</p>
-                      </div>
-                  </div>
-
-                  <div className="mb-4">
-                      <table className="w-full text-left">
-                          <thead>
-                              <tr className="border-b-2 border-slate-900 bg-slate-50">
-                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
-                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
-                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
-                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
-                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
-                              </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                              {billItems.map((item, idx) => (
-                                  <tr key={idx} className="text-[11px] font-bold border-b border-slate-50">
-                                      <td className="py-2 px-2 uppercase">{item.productName}</td>
-                                      <td className="py-2 px-2 text-center">{item.quantity}</td>
-                                      <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
-                                      <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
-                                      <td className="py-2 px-2 text-right">
-                                          {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                                      </td>
-                                  </tr>
-                              ))}
-                          </tbody>
-                      </table>
-                  </div>
-
-                  <div className="flex justify-end pt-4 border-t-2 border-slate-900">
-                      <div className="w-56 space-y-2">
-                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                              <span>{t('totalSales')}</span>
-                              <span>₹{totals.totalNew.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                              <span>{t('totalScrapBuy')}</span>
-                              <span>-₹{totals.totalWaste.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1">
-                              <span className="uppercase tracking-widest">{t('subtotal')}</span>
-                              <span>₹{totals.subtotal.toFixed(2)}</span>
-                          </div>
-                          {gstEnabled && (
-                              <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                                  <span>{t('taxes')}</span>
-                                  <span>₹{totals.tax.toFixed(2)}</span>
-                              </div>
-                          )}
-                          {shippingEnabled && (
-                              <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                                  <span>{t('shippingLogistics')}</span>
-                                  <span>₹{totals.logistics.toFixed(2)}</span>
-                              </div>
-                          )}
-                          <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2">
-                              <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
-                              <span>₹{totals.net.toFixed(2)}</span>
-                          </div>
-                      </div>
-                  </div>
-
-                  <div className="mt-10 pt-4 border-t border-slate-100 text-center">
-                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
-                  </div>
+              <div className="invoice-footer mt-10 pt-4 border-t border-slate-100 text-center">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
               </div>
-          )}
+          </div>
       </div>
 
       <style>{`
           @media print {
               @page {
-                  size: ${printType === 'pos80' ? '80mm auto' : printType === 'pos58' ? '58mm auto' : 'A5'};
-                  margin: 0 !important;
+                  size: A4;
+                  margin: 1.2cm !important;
               }
               body * {
                   visibility: hidden !important;
@@ -861,104 +768,148 @@ const BillingPage = () => {
                   position: absolute !important;
                   left: 0 !important;
                   top: 0 !important;
-                  width: ${printType === 'pos80' ? '80mm' : printType === 'pos58' ? '58mm' : '100%'} !important;
+                  width: 100% !important;
                   display: block !important;
                   padding: 0 !important;
                   margin: 0 !important;
+                  background: white !important;
+                  color: black !important;
               }
               
-              /* Zero out paper margins and paddings for POS to maximize print width */
-              .print-pos-layout {
-                  width: 100% !important;
-                  padding: 0 !important;
-                  margin: 0 !important;
-              }
-              
-              .pos-receipt {
-                  width: 100% !important;
-                  padding: 0 !important;
-                  margin: 0 !important;
+              /* Thin borders in print */
+              #printable-invoice border-slate-900,
+              #printable-invoice border-black,
+              #printable-invoice .border-b-2,
+              #printable-invoice .border-t-2 {
+                  border-color: #000000 !important;
+                  border-width: 1px !important;
               }
 
-              .pos-receipt .my-2 {
-                  margin-top: 2px !important;
-                  margin-bottom: 2px !important;
-              }
-              .pos-receipt .my-1 {
-                  margin-top: 1px !important;
-                  margin-bottom: 1px !important;
-              }
-              .pos-receipt .mb-2 {
-                  margin-bottom: 2px !important;
-              }
-              .pos-receipt .mb-4 {
-                  margin-bottom: 3px !important;
-              }
-              .pos-receipt .mt-2 {
-                  margin-top: 2px !important;
-              }
-
-              .print-compact {
-                  font-size: 9px !important;
-              }
-              .print-compact td, .print-compact th {
-                  padding-top: 3px !important;
-                  padding-bottom: 3px !important;
-              }
-              .print-compact .mb-4 {
-                  margin-bottom: 8px !important;
-              }
-              .print-compact .mt-10 {
-                  margin-top: 20px !important;
-              }
+              /* A4 Dynamic Scaling to fit up to 100 items on a single page */
               
-              /* POS Dynamic Scaling */
-              .pos-compact {
+              /* Level 1: 11 - 25 items */
+              .a4-compact {
                   font-size: 9.5px !important;
               }
-              .pos-compact .text-[10px] {
-                  font-size: 8.5px !important;
+              .a4-compact td, .a4-compact th {
+                  padding-top: 2px !important;
+                  padding-bottom: 2px !important;
+                  padding-left: 4px !important;
+                  padding-right: 4px !important;
               }
-              .pos-compact .text-xs {
-                  font-size: 10px !important;
+              .a4-compact .mb-4, .a4-compact .mb-6 {
+                  margin-bottom: 8px !important;
               }
-              .pos-compact .my-2 {
-                  margin-top: 2px !important;
-                  margin-bottom: 2px !important;
+              .a4-compact .mt-10 {
+                  margin-top: 15px !important;
               }
-              .pos-compact .my-1 {
-                  margin-top: 1px !important;
-                  margin-bottom: 1px !important;
+              .a4-compact h1 {
+                  font-size: 18px !important;
               }
-              .pos-compact .mb-2 {
-                  margin-bottom: 2px !important;
+              .a4-compact .p-6 {
+                  padding: 10px !important;
               }
-              .pos-compact .mb-4 {
+
+              /* Level 2: 26 - 50 items */
+              .a4-ultra-compact {
+                  font-size: 8px !important;
+              }
+              .a4-ultra-compact td, .a4-ultra-compact th {
+                  padding-top: 1px !important;
+                  padding-bottom: 1px !important;
+                  padding-left: 2px !important;
+                  padding-right: 2px !important;
+              }
+              .a4-ultra-compact .mb-4, .a4-ultra-compact .mb-6 {
                   margin-bottom: 4px !important;
               }
-              
-              .pos-ultra-compact {
-                  font-size: 8.5px !important;
+              .a4-ultra-compact .mt-10 {
+                  margin-top: 10px !important;
               }
-              .pos-ultra-compact .text-[10px] {
-                  font-size: 7.5px !important;
+              .a4-ultra-compact h1 {
+                  font-size: 14px !important;
               }
-              .pos-ultra-compact .text-xs {
-                  font-size: 9px !important;
+              .a4-ultra-compact .p-6 {
+                  padding: 5px !important;
               }
-              .pos-ultra-compact .my-2 {
-                  margin-top: 1px !important;
-                  margin-bottom: 1px !important;
+
+              /* Level 3: 51 - 75 items */
+              .a4-micro-compact {
+                  font-size: 6.8px !important;
               }
-              .pos-ultra-compact .my-1 {
-                  margin-top: 0.5px !important;
-                  margin-bottom: 0.5px !important;
+              .a4-micro-compact td, .a4-micro-compact th {
+                  padding-top: 0.5px !important;
+                  padding-bottom: 0.5px !important;
+                  padding-left: 1px !important;
+                  padding-right: 1px !important;
+                  line-height: 1.1 !important;
               }
-              .pos-ultra-compact .mb-2 {
-                  margin-bottom: 1px !important;
-              }
-              .pos-ultra-compact .mb-4 {
+              .a4-micro-compact .mb-4, .a4-micro-compact .mb-6 {
                   margin-bottom: 2px !important;
+              }
+              .a4-micro-compact .mt-10 {
+                  margin-top: 5px !important;
+              }
+              .a4-micro-compact h1 {
+                  font-size: 10px !important;
+              }
+              .a4-micro-compact .p-6 {
+                  padding: 2px !important;
+              }
+              .a4-micro-compact .logo-wrapper {
+                  display: none !important;
+              }
+              .a4-micro-compact .customer-card {
+                  padding: 4px !important;
+              }
+
+              /* Level 4: 76 - 100+ items */
+              .a4-nano-compact {
+                  font-size: 5.5px !important;
+              }
+              .a4-nano-compact td, .a4-nano-compact th {
+                  padding-top: 0.1px !important;
+                  padding-bottom: 0.1px !important;
+                  padding-left: 0.5px !important;
+                  padding-right: 0.5px !important;
+                  line-height: 1.0 !important;
+              }
+              .a4-nano-compact .mb-4, .a4-nano-compact .mb-6 {
+                  margin-bottom: 1px !important;
+              }
+              .a4-nano-compact .mt-10 {
+                  margin-top: 1px !important;
+              }
+              .a4-nano-compact h1 {
+                  font-size: 8px !important;
+                  line-height: 1.0 !important;
+              }
+              .a4-nano-compact h2 {
+                  font-size: 7px !important;
+                  line-height: 1.0 !important;
+              }
+              .a4-nano-compact .p-6 {
+                  padding: 0px !important;
+              }
+              .a4-nano-compact .logo-wrapper {
+                  display: none !important;
+              }
+              .a4-nano-compact .customer-card {
+                  padding: 2px !important;
+              }
+              .a4-nano-compact .grid {
+                  gap: 4px !important;
+              }
+              .a4-nano-compact .totals-container {
+                  width: 140px !important;
+              }
+              .a4-nano-compact .totals-container > * + * {
+                  margin-top: 1px !important;
+              }
+              .a4-nano-compact .net-row {
+                  font-size: 7px !important;
+                  margin-top: 2px !important;
+                  padding-top: 2px !important;
               }
               
               .no-print, .fixed, button, select, input {
