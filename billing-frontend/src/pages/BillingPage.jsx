@@ -40,8 +40,7 @@ const BillingPage = () => {
   const [shippingAmount, setShippingAmount] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
-  const [printType, setPrintType] = useState('a4');
-  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printType, setPrintType] = useState('pos80');
 
   useEffect(() => {
     fetchProducts();
@@ -88,15 +87,7 @@ const BillingPage = () => {
   };
 
   const handlePrint = () => {
-    setShowPrintModal(true);
-  };
-
-  const triggerPrint = (type) => {
-    setPrintType(type);
-    setShowPrintModal(false);
-    setTimeout(() => {
-      window.print();
-    }, 150);
+    window.print();
   };
 
   const addItem = (type) => {
@@ -625,77 +616,12 @@ const BillingPage = () => {
         </div>
       )}
 
-      {/* Print Options Modal */}
-      {showPrintModal && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 no-print">
-            <div className="w-full max-w-lg bg-white rounded-[40px] p-8 md:p-10 text-center relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-slate-100">
-                <button
-                    onClick={() => setShowPrintModal(false)}
-                    className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
-                >
-                    <X size={24} />
-                </button>
-                <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Select Print Format</h3>
-                <p className="text-slate-500 font-medium mb-8">Choose the layout that matches your printer</p>
 
-                <div className="grid grid-cols-3 gap-3 mb-8">
-                    {/* A4 Invoice Option */}
-                    <button
-                        onClick={() => triggerPrint('a4')}
-                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-red-50/30 border border-slate-200 hover:border-red-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                    >
-                        <div className="w-12 h-12 bg-red-100 group-hover:bg-red-500 rounded-xl flex items-center justify-center text-red-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
-                            <FileText size={20} />
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">A4 / A5</h4>
-                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
-                            Standard layout
-                        </p>
-                    </button>
-
-                    {/* POS 80mm Option */}
-                    <button
-                        onClick={() => triggerPrint('pos80')}
-                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-amber-50/30 border border-slate-200 hover:border-amber-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                    >
-                        <div className="w-12 h-12 bg-amber-100 group-hover:bg-amber-500 rounded-xl flex items-center justify-center text-amber-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
-                            <Printer size={20} />
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">POS 80mm</h4>
-                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
-                            3-inch roll
-                        </p>
-                    </button>
-
-                    {/* POS 58mm Option */}
-                    <button
-                        onClick={() => triggerPrint('pos58')}
-                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-emerald-50/30 border border-slate-200 hover:border-emerald-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                    >
-                        <div className="w-12 h-12 bg-emerald-100 group-hover:bg-emerald-500 rounded-xl flex items-center justify-center text-emerald-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
-                            <Printer size={20} />
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">POS 58mm</h4>
-                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
-                            2-inch roll
-                        </p>
-                    </button>
-                </div>
-
-                <button
-                    onClick={() => setShowPrintModal(false)}
-                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-colors"
-                >
-                    Cancel
-                </button>
-            </div>
-        </div>
-      )}
 
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
       <div id="printable-invoice" className={`hidden print:block bg-white text-black ${printType.startsWith('pos') ? 'print-pos-layout font-mono' : `font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}`}>
           {printType.startsWith('pos') ? (
-              <div className={`pos-receipt leading-tight mx-auto p-1.5 ${printType === 'pos58' ? 'max-w-[58mm] text-[9.5px]' : 'max-w-[80mm] text-[11px]'}`}>
+              <div className={`pos-receipt leading-tight mx-auto p-1.5 ${printType === 'pos58' ? 'max-w-[58mm] text-[9.5px]' : 'max-w-[80mm] text-[11px]'} ${billItems.length > 12 ? 'pos-ultra-compact' : billItems.length > 6 ? 'pos-compact' : ''}`}>
                   <div className="text-center mb-2">
                       <h1 className={`${printType === 'pos58' ? 'text-xs' : 'text-sm'} font-black uppercase tracking-tight`}>RTS PLASTICS</h1>
                       <p className={`${printType === 'pos58' ? 'text-[8px]' : 'text-[9px]'} font-bold uppercase`}>{user.storeName || t('mainUnit')}</p>
@@ -896,7 +822,7 @@ const BillingPage = () => {
           @media print {
               @page {
                   size: ${printType === 'pos80' ? '80mm auto' : printType === 'pos58' ? '58mm auto' : 'A5'};
-                  margin: ${printType.startsWith('pos') ? '0' : '5mm'};
+                  margin: 0 !important;
               }
               body * {
                   visibility: hidden !important;
@@ -912,9 +838,41 @@ const BillingPage = () => {
                   top: 0 !important;
                   width: ${printType === 'pos80' ? '80mm' : printType === 'pos58' ? '58mm' : '100%'} !important;
                   display: block !important;
-                  padding: ${printType.startsWith('pos') ? '0' : '0'} !important;
+                  padding: 0 !important;
                   margin: 0 !important;
               }
+              
+              /* Zero out paper margins and paddings for POS to maximize print width */
+              .print-pos-layout {
+                  width: 100% !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+              }
+              
+              .pos-receipt {
+                  width: 100% !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+              }
+
+              .pos-receipt .my-2 {
+                  margin-top: 2px !important;
+                  margin-bottom: 2px !important;
+              }
+              .pos-receipt .my-1 {
+                  margin-top: 1px !important;
+                  margin-bottom: 1px !important;
+              }
+              .pos-receipt .mb-2 {
+                  margin-bottom: 2px !important;
+              }
+              .pos-receipt .mb-4 {
+                  margin-bottom: 3px !important;
+              }
+              .pos-receipt .mt-2 {
+                  margin-top: 2px !important;
+              }
+
               .print-compact {
                   font-size: 9px !important;
               }
@@ -928,6 +886,56 @@ const BillingPage = () => {
               .print-compact .mt-10 {
                   margin-top: 20px !important;
               }
+              
+              /* POS Dynamic Scaling */
+              .pos-compact {
+                  font-size: 9.5px !important;
+              }
+              .pos-compact .text-[10px] {
+                  font-size: 8.5px !important;
+              }
+              .pos-compact .text-xs {
+                  font-size: 10px !important;
+              }
+              .pos-compact .my-2 {
+                  margin-top: 2px !important;
+                  margin-bottom: 2px !important;
+              }
+              .pos-compact .my-1 {
+                  margin-top: 1px !important;
+                  margin-bottom: 1px !important;
+              }
+              .pos-compact .mb-2 {
+                  margin-bottom: 2px !important;
+              }
+              .pos-compact .mb-4 {
+                  margin-bottom: 4px !important;
+              }
+              
+              .pos-ultra-compact {
+                  font-size: 8.5px !important;
+              }
+              .pos-ultra-compact .text-[10px] {
+                  font-size: 7.5px !important;
+              }
+              .pos-ultra-compact .text-xs {
+                  font-size: 9px !important;
+              }
+              .pos-ultra-compact .my-2 {
+                  margin-top: 1px !important;
+                  margin-bottom: 1px !important;
+              }
+              .pos-ultra-compact .my-1 {
+                  margin-top: 0.5px !important;
+                  margin-bottom: 0.5px !important;
+              }
+              .pos-ultra-compact .mb-2 {
+                  margin-bottom: 1px !important;
+              }
+              .pos-ultra-compact .mb-4 {
+                  margin-bottom: 2px !important;
+              }
+              
               .no-print, .fixed, button, select, input {
                   display: none !important;
               }
