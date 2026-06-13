@@ -215,7 +215,7 @@ const BillingPage = () => {
 
   return (
     <>
-      <div className="flex flex-col md:flex-row bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)] pb-24 md:pb-0">
+      <div className="flex flex-col md:flex-row bg-[var(--bg-main)] min-h-screen transition-colors duration-500 text-[var(--text-main)] pb-24 md:pb-0 no-print">
       {/* Middle Section: Bill Editor - Optimized for Space */}
       <div className="flex-1 p-4 md:p-6 space-y-4 max-w-[1200px] md:border-r border-slate-200 overflow-y-auto">
 
@@ -752,6 +752,12 @@ const BillingPage = () => {
 
       <style>{`
           @media print {
+              html, body {
+                  height: 100% !important;
+                  overflow: hidden !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+              }
               @page {
                   size: A4;
                   margin: 1.2cm !important;
@@ -774,6 +780,13 @@ const BillingPage = () => {
                   margin: 0 !important;
                   background: white !important;
                   color: black !important;
+                  page-break-inside: avoid !important;
+                  break-inside: avoid !important;
+              }
+              
+              /* Remove extra padding around invoice container inside 1.2cm margin */
+              #printable-invoice .invoice-container {
+                  padding: 0 !important;
               }
               
               /* Thin borders in print */
