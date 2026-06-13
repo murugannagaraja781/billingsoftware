@@ -628,7 +628,7 @@ const BillingPage = () => {
       {/* Print Options Modal */}
       {showPrintModal && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 no-print">
-            <div className="w-full max-w-md bg-white rounded-[40px] p-8 md:p-10 text-center relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-slate-100">
+            <div className="w-full max-w-lg bg-white rounded-[40px] p-8 md:p-10 text-center relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-slate-100">
                 <button
                     onClick={() => setShowPrintModal(false)}
                     className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
@@ -638,32 +638,46 @@ const BillingPage = () => {
                 <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Select Print Format</h3>
                 <p className="text-slate-500 font-medium mb-8">Choose the layout that matches your printer</p>
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-3 gap-3 mb-8">
                     {/* A4 Invoice Option */}
                     <button
                         onClick={() => triggerPrint('a4')}
-                        className="flex flex-col items-center p-6 bg-slate-50 hover:bg-red-50/30 border border-slate-200 hover:border-red-500/30 rounded-[28px] transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-red-50/30 border border-slate-200 hover:border-red-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
                     >
-                        <div className="w-16 h-16 bg-red-100 group-hover:bg-red-500 rounded-2xl flex items-center justify-center text-red-600 group-hover:text-white transition-all mb-4 shadow-inner">
-                            <FileText size={28} />
+                        <div className="w-12 h-12 bg-red-100 group-hover:bg-red-500 rounded-xl flex items-center justify-center text-red-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
+                            <FileText size={20} />
                         </div>
-                        <h4 className="font-bold text-slate-900 text-sm mb-1 uppercase tracking-wider">A4 / A5</h4>
-                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                            Standard invoice layout
+                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">A4 / A5</h4>
+                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
+                            Standard layout
                         </p>
                     </button>
 
-                    {/* POS Receipt Option */}
+                    {/* POS 80mm Option */}
                     <button
-                        onClick={() => triggerPrint('pos')}
-                        className="flex flex-col items-center p-6 bg-slate-50 hover:bg-amber-50/30 border border-slate-200 hover:border-amber-500/30 rounded-[28px] transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                        onClick={() => triggerPrint('pos80')}
+                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-amber-50/30 border border-slate-200 hover:border-amber-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
                     >
-                        <div className="w-16 h-16 bg-amber-100 group-hover:bg-amber-500 rounded-2xl flex items-center justify-center text-amber-600 group-hover:text-white transition-all mb-4 shadow-inner">
-                            <Printer size={28} />
+                        <div className="w-12 h-12 bg-amber-100 group-hover:bg-amber-500 rounded-xl flex items-center justify-center text-amber-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
+                            <Printer size={20} />
                         </div>
-                        <h4 className="font-bold text-slate-900 text-sm mb-1 uppercase tracking-wider">POS Roll</h4>
-                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                            80mm thermal receipt
+                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">POS 80mm</h4>
+                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
+                            3-inch roll
+                        </p>
+                    </button>
+
+                    {/* POS 58mm Option */}
+                    <button
+                        onClick={() => triggerPrint('pos58')}
+                        className="flex flex-col items-center p-4 bg-slate-50 hover:bg-emerald-50/30 border border-slate-200 hover:border-emerald-500/30 rounded-2xl transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                    >
+                        <div className="w-12 h-12 bg-emerald-100 group-hover:bg-emerald-500 rounded-xl flex items-center justify-center text-emerald-600 group-hover:text-white transition-all mb-2.5 shadow-inner">
+                            <Printer size={20} />
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-xs mb-1 uppercase tracking-wider">POS 58mm</h4>
+                        <p className="text-[9px] text-slate-500 font-medium leading-tight">
+                            2-inch roll
                         </p>
                     </button>
                 </div>
@@ -679,13 +693,13 @@ const BillingPage = () => {
       )}
 
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
-      <div id="printable-invoice" className={`hidden print:block bg-white text-black ${printType === 'pos' ? 'print-pos-layout font-mono' : `font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}`}>
-          {printType === 'pos' ? (
-              <div className="pos-receipt text-[11px] leading-tight max-w-[80mm] p-2 mx-auto">
+      <div id="printable-invoice" className={`hidden print:block bg-white text-black ${printType.startsWith('pos') ? 'print-pos-layout font-mono' : `font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}`}>
+          {printType.startsWith('pos') ? (
+              <div className={`pos-receipt leading-tight mx-auto p-1.5 ${printType === 'pos58' ? 'max-w-[58mm] text-[9.5px]' : 'max-w-[80mm] text-[11px]'}`}>
                   <div className="text-center mb-2">
-                      <h1 className="text-sm font-black uppercase tracking-tight">RTS PLASTICS</h1>
-                      <p className="text-[9px] font-bold uppercase">{user.storeName || t('mainUnit')}</p>
-                      <p className="text-[8px] text-slate-500">{new Date().toLocaleString()}</p>
+                      <h1 className={`${printType === 'pos58' ? 'text-xs' : 'text-sm'} font-black uppercase tracking-tight`}>RTS PLASTICS</h1>
+                      <p className={`${printType === 'pos58' ? 'text-[8px]' : 'text-[9px]'} font-bold uppercase`}>{user.storeName || t('mainUnit')}</p>
+                      <p className={`${printType === 'pos58' ? 'text-[7px]' : 'text-[8px]'} text-slate-500`}>{new Date().toLocaleString()}</p>
                   </div>
                   
                   <div className="border-t border-dashed border-black my-2"></div>
@@ -723,8 +737,8 @@ const BillingPage = () => {
                       <div className="border-t border-dotted border-black my-1"></div>
                       {billItems.map((item, idx) => (
                           <div key={idx} className="space-y-0.5">
-                              <div className="font-bold uppercase text-[10px]">{item.productName} ({item.type === 'sold' ? 'NEW' : 'SCRAP'})</div>
-                              <div className="flex justify-between text-[10px]">
+                              <div className={`font-bold uppercase ${printType === 'pos58' ? 'text-[8.5px]' : 'text-[10px]'}`}>{item.productName} ({item.type === 'sold' ? 'NEW' : 'SCRAP'})</div>
+                              <div className={`flex justify-between ${printType === 'pos58' ? 'text-[8.5px]' : 'text-[10px]'}`}>
                                   <span className="text-slate-600 pl-2">
                                       {item.quantity} {item.unit} x ₹{item.unitPrice.toFixed(2)}
                                   </span>
@@ -766,7 +780,7 @@ const BillingPage = () => {
                           </div>
                       )}
                       <div className="border-t border-dashed border-black my-1"></div>
-                      <div className="flex justify-between text-xs font-black uppercase pt-1">
+                      <div className={`flex justify-between ${printType === 'pos58' ? 'text-[11px]' : 'text-xs'} font-black uppercase pt-1`}>
                           <span>Net Receivable:</span>
                           <span>₹{totals.net.toFixed(2)}</span>
                       </div>
@@ -774,9 +788,9 @@ const BillingPage = () => {
                   
                   <div className="border-t border-dashed border-black my-2"></div>
                   
-                  <div className="text-center italic mt-2 text-[9px]">
+                  <div className={`text-center italic mt-2 ${printType === 'pos58' ? 'text-[8px]' : 'text-[9px]'}`}>
                       <p>Thank you for choosing RTS Plastics!</p>
-                      <p className="text-[8px] text-slate-500 mt-1">Generated by PlastiCore Billing</p>
+                      <p className="text-[7px] text-slate-500 mt-1">Generated by PlastiCore Billing</p>
                   </div>
               </div>
           ) : (
@@ -881,8 +895,8 @@ const BillingPage = () => {
       <style>{`
           @media print {
               @page {
-                  size: ${printType === 'pos' ? '80mm auto' : 'A5'};
-                  margin: ${printType === 'pos' ? '0' : '5mm'};
+                  size: ${printType === 'pos80' ? '80mm auto' : printType === 'pos58' ? '58mm auto' : 'A5'};
+                  margin: ${printType.startsWith('pos') ? '0' : '5mm'};
               }
               body * {
                   visibility: hidden !important;
@@ -896,9 +910,9 @@ const BillingPage = () => {
                   position: absolute !important;
                   left: 0 !important;
                   top: 0 !important;
-                  width: ${printType === 'pos' ? '80mm' : '100%'} !important;
+                  width: ${printType === 'pos80' ? '80mm' : printType === 'pos58' ? '58mm' : '100%'} !important;
                   display: block !important;
-                  padding: ${printType === 'pos' ? '0' : '0'} !important;
+                  padding: ${printType.startsWith('pos') ? '0' : '0'} !important;
                   margin: 0 !important;
               }
               .print-compact {

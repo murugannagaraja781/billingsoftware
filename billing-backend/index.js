@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
+const https = require('https');
 const { Server } = require('socket.io');
 
 dotenv.config();
@@ -70,7 +71,7 @@ server.listen(PORT, () => {
     const url = `https://billingsoftware-vmoo.onrender.com`;
     if (url.includes('onrender')) {
         setInterval(() => {
-            http.get(url, (res) => {
+            https.get(url, (res) => {
                 console.log('Self-ping to stay awake...');
             }).on('error', (err) => {
                 console.error('Self-ping error:', err.message);
