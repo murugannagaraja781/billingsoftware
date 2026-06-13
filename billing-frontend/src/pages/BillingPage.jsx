@@ -40,11 +40,44 @@ const BillingPage = () => {
   const [shippingAmount, setShippingAmount] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [invoiceHeader, setInvoiceHeader] = useState({
+    companyName: 'RTS Plastics',
+    storeSubtitle: 'Main Plastic Factory',
+    address: 'Industrial Area 4, Chennai, Tamil Nadu, India',
+    contact: 'Tel: +91 44 2250 1234 | Email: billing@rtsplastics.in',
+    taxId: 'GSTIN: 33AAAAA1111A1Z1',
+    bankName: 'State Bank of India',
+    bankAccNo: '31234567890',
+    bankIfsc: 'SBIN0001234',
+    paymentTerms: 'Terms: Net 15 days'
+  });
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   useEffect(() => {
     fetchProducts();
     fetchCustomers();
+    fetchStoreDetails();
   }, []);
+
+  const fetchStoreDetails = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/api/stores`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      if (user.storeId && data.length > 0) {
+        const myStore = data.find(s => s._id === user.storeId);
+        if (myStore) {
+          setInvoiceHeader(prev => ({
+            ...prev,
+            storeSubtitle: myStore.name,
+            address: myStore.location || prev.address
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching store details:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -595,7 +628,15 @@ const BillingPage = () => {
 
       {/* Right Sidebar: Order Summary */}
       <div className="w-full md:w-80 p-5 bg-white md:sticky md:top-0 md:h-screen flex flex-col border-t md:border-t-0 md:border-l border-slate-200 mb-20 md:mb-0">
-        <h4 className="text-base font-black text-[var(--text-primary)] mb-4 tracking-tighter uppercase">{t('orderSummary')}</h4>
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-base font-black text-[var(--text-primary)] tracking-tighter uppercase">{t('orderSummary')}</h4>
+          <button 
+            onClick={() => setShowSettingsModal(true)} 
+            className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-red-600 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition-all"
+          >
+            Edit Header
+          </button>
+        </div>
 
         <div className="space-y-3 flex-1 flex flex-col">
             <div className="flex justify-between items-center text-sm font-bold">
@@ -794,6 +835,125 @@ const BillingPage = () => {
         </div>
       )}
 
+      {/* Invoice Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 no-print">
+            <div className="w-full max-w-lg bg-white rounded-3xl p-8 md:p-10 relative shadow-2xl border border-slate-200">
+                <button onClick={() => setShowSettingsModal(false)} className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors">
+                    <X size={24} />
+                </button>
+                <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">{t('invoicePrintDetails')}</h3>
+                <p className="text-slate-500 text-sm font-medium mb-6">{t('customizePrintDesc')}</p>
+
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('companyName')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                                value={invoiceHeader.companyName}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, companyName: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('branchSubtitle')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                                value={invoiceHeader.storeSubtitle}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, storeSubtitle: e.target.value})}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('address')}</label>
+                        <input
+                            type="text"
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                            value={invoiceHeader.address}
+                            onChange={(e) => setInvoiceHeader({...invoiceHeader, address: e.target.value})}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('contactDetails')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                                value={invoiceHeader.contact}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, contact: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('taxIdGstin')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                                value={invoiceHeader.taxId}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, taxId: e.target.value})}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-slate-100 my-2"></div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('bankDetailsPrint')}</p>
+
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-1 col-span-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('bankName')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-[11px]"
+                                value={invoiceHeader.bankName}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, bankName: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-1 col-span-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('accountNo')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-[11px]"
+                                value={invoiceHeader.bankAccNo}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, bankAccNo: e.target.value})}
+                            />
+                        </div>
+                        <div className="space-y-1 col-span-1">
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('ifscCode')}</label>
+                            <input
+                                type="text"
+                                className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-[11px]"
+                                value={invoiceHeader.bankIfsc}
+                                onChange={(e) => setInvoiceHeader({...invoiceHeader, bankIfsc: e.target.value})}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('termsNote')}</label>
+                        <input
+                            type="text"
+                            className="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 outline-none focus:ring-2 focus:ring-red-500/20 font-bold text-xs"
+                            value={invoiceHeader.paymentTerms}
+                            onChange={(e) => setInvoiceHeader({...invoiceHeader, paymentTerms: e.target.value})}
+                        />
+                    </div>
+                </div>
+
+                <div className="pt-6 mt-4 border-t border-slate-100 flex justify-end">
+                    <button 
+                        onClick={() => setShowSettingsModal(false)} 
+                        className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl tracking-widest uppercase text-[10px] font-black shadow-lg shadow-red-600/20"
+                    >
+                        {t('applyDetails')}
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
+
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[500] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 no-print">
@@ -849,14 +1009,19 @@ const BillingPage = () => {
                                   </div>
                               )}
                               <div>
-                                  <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>RTS Plastics</h1>
-                                  <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{user.storeName || t('mainUnit')}</p>
-                                  <p className="text-slate-500 italic invoice-date" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)` }}>{new Date().toLocaleString()}</p>
+                                  <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>{invoiceHeader.companyName}</h1>
+                                  <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{invoiceHeader.storeSubtitle}</p>
+                                  <p className="text-slate-500 leading-tight store-address" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)`, marginTop: '4px' }}>
+                                      {invoiceHeader.address} | {invoiceHeader.contact}<br />
+                                      {invoiceHeader.taxId}
+                                  </p>
                               </div>
                           </div>
-                          <div className="text-right">
-                              <h2 className="font-black uppercase tracking-tight" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>{t('printInvoice')}</h2>
-                              <p className="font-bold invoice-id" style={{ fontSize: printConfig.fontSize }}>#{invoiceId}</p>
+                          <div className="text-right flex flex-col items-end space-y-0.5" style={{ fontSize: printConfig.fontSize }}>
+                              <h2 className="font-black uppercase tracking-tight mb-1" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>{t('printInvoice')}</h2>
+                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Invoice No:</span> #{invoiceId}</p>
+                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Date:</span> {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Due Date:</span> {new Date(Date.now() + 15*24*60*60*1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                           </div>
                       </div>
 
@@ -880,7 +1045,8 @@ const BillingPage = () => {
                           <table className="w-full text-left print-table">
                               <thead>
                                   <tr className="border-b border-slate-900 bg-slate-50 invoice-table-hdr">
-                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-left" style={{ fontSize: printConfig.thFontSize, width: '50%' }}>{t('item')}</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize, width: '8%' }}>Item #</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-left" style={{ fontSize: printConfig.thFontSize, width: '42%' }}>{t('item')}</th>
                                       <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize, width: '10%' }}>{t('qty')}</th>
                                       <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize, width: '10%' }}>{t('unit')}</th>
                                       <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize, width: '15%' }}>{t('price')}</th>
@@ -890,6 +1056,7 @@ const BillingPage = () => {
                               <tbody className="divide-y divide-slate-100">
                                   {billItems.map((item, idx) => (
                                       <tr key={idx} className="font-bold border-b border-slate-50 invoice-table-row">
+                                          <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{idx + 1}</td>
                                           <td className="uppercase break-words leading-tight" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.productName}</td>
                                           <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
                                           <td className="text-center uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.unit}</td>
@@ -903,7 +1070,17 @@ const BillingPage = () => {
                           </table>
                       </div>
 
-                      <div className="invoice-totals-wrapper flex justify-end pt-2 border-t border-slate-900">
+                      <div className="invoice-totals-wrapper flex justify-between items-start pt-2 border-t border-slate-900">
+                          {/* Bottom Left: Payment Details */}
+                          <div className="payment-details-wrapper text-left text-slate-600 font-bold" style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, maxWidth: '280px', marginTop: '4px' }}>
+                              <p className="font-black uppercase tracking-widest text-slate-900" style={{ fontSize: `calc(${printConfig.fontSize} * 0.85)`, marginBottom: '4px' }}>Payment/Bank Details:</p>
+                              <p className="font-semibold text-slate-700">Bank Name: {invoiceHeader.bankName}</p>
+                              <p className="font-semibold text-slate-700">A/C No: {invoiceHeader.bankAccNo}</p>
+                              <p className="font-semibold text-slate-700">IFSC: {invoiceHeader.bankIfsc}</p>
+                              <p className="text-slate-500 italic mt-1 font-medium">{invoiceHeader.paymentTerms}</p>
+                          </div>
+
+                          {/* Bottom Right: Totals */}
                           <div className="totals-container" style={{ width: printConfig.totalsContainerWidth }}>
                               <div 
                                 className="flex justify-between items-center font-bold uppercase text-slate-500 total-row"
@@ -958,7 +1135,7 @@ const BillingPage = () => {
                         className="invoice-footer border-t border-slate-100 text-center"
                         style={{ marginTop: printConfig.footerMt, paddingTop: `calc(${printConfig.footerMt} * 0.5)` }}
                       >
-                          <p className="font-black uppercase tracking-[0.2em] text-slate-400 italic" style={{ fontSize: `calc(${printConfig.fontSize} * 0.8)` }}>Thank you for choosing RTS Plastics</p>
+                          <p className="font-black uppercase tracking-[0.2em] text-slate-400 italic" style={{ fontSize: `calc(${printConfig.fontSize} * 0.8)` }}>Thank you for choosing {invoiceHeader.companyName}</p>
                       </div>
                   </div>
               </div>
@@ -1007,6 +1184,12 @@ const BillingPage = () => {
                   padding-right: 0 !important;
               }
               
+              /* Force webkit and standard browsers to render background colors in print */
+              #printable-invoice {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+              }
+
               /* Thin borders in print */
               #printable-invoice .border-slate-900,
               #printable-invoice .border-black,
@@ -1014,17 +1197,24 @@ const BillingPage = () => {
               #printable-invoice .border-t-2,
               #printable-invoice .border-t,
               #printable-invoice .border-b {
-                  border-color: #e2e8f0 !important;
+                  border-color: #cbd5e1 !important;
                   border-width: 1px !important;
               }
 
-              /* Print table properties to maintain compact columns */
+              /* Print table properties to maintain compact columns & spreadsheet grid look */
               #printable-invoice .print-table {
                   width: 100% !important;
                   max-width: 600px !important;
                   table-layout: fixed !important;
                   margin-left: 0 !important;
                   margin-right: auto !important;
+                  border-collapse: collapse !important;
+                  border: 1px solid #cbd5e1 !important;
+              }
+
+              #printable-invoice .print-table th,
+              #printable-invoice .print-table td {
+                  border: 1px solid #cbd5e1 !important;
               }
 
               /* A4 Dynamic Scaling to fit up to 100 items on a single page */

@@ -212,7 +212,20 @@ export const resources = {
             "mainMenu": "Main Menu",
             "management": "Management",
             "english": "English",
-            "tamil": "Tamil"
+            "tamil": "Tamil",
+            "invoicePrintDetails": "Invoice Print Details",
+            "customizePrintDesc": "Customize the business details and payment info for the printed invoice.",
+            "companyName": "Company Name",
+            "branchSubtitle": "Branch / Subtitle",
+            "address": "Address",
+            "contactDetails": "Contact Details",
+            "taxIdGstin": "Tax ID / GSTIN",
+            "bankDetailsPrint": "Bank Details for Print",
+            "bankName": "Bank Name",
+            "accountNo": "Account No",
+            "ifscCode": "IFSC Code",
+            "termsNote": "Terms / Note",
+            "applyDetails": "Apply Details"
         }
     },
     ta: {
@@ -438,7 +451,20 @@ export const resources = {
             "mainMenu": "முதன்மை மெனு",
             "management": "மேலாண்மை",
             "english": "ஆங்கிலம்",
-            "tamil": "தமிழ்"
+            "tamil": "தமிழ்",
+            "invoicePrintDetails": "இன்வாய்ஸ் அச்சு விவரங்கள்",
+            "customizePrintDesc": "அச்சிடப்பட்ட இன்வாய்ஸிற்கான நிறுவன விவரங்கள் மற்றும் வங்கித் தகவலைத் தனிப்பயனாக்கவும்.",
+            "companyName": "நிறுவனத்தின் பெயர்",
+            "branchSubtitle": "கிளை / துணைத்தலைப்பு",
+            "address": "முகவரி",
+            "contactDetails": "தொடர்பு விவரங்கள்",
+            "taxIdGstin": "வரி எண் / GSTIN",
+            "bankDetailsPrint": "அச்சிடுவதற்கான வங்கி விவரங்கள்",
+            "bankName": "வங்கி பெயர்",
+            "accountNo": "கணக்கு எண்",
+            "ifscCode": "IFSC குறியீடு",
+            "termsNote": "விதிமுறைகள் / குறிப்பு",
+            "applyDetails": "விவரங்களைச் சேமி"
         }
     }
 };
