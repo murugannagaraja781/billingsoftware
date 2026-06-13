@@ -67,6 +67,22 @@ const createTransaction = async (req, res) => {
     }
 };
 
+const getTransactions = async (req, res) => {
+    try {
+        let query = {};
+        if (req.user.role === 'manager') {
+            query.storeId = req.user.storeId;
+        }
+        const transactions = await Transaction.find(query)
+            .populate('storeId', 'name location')
+            .populate('managedBy', 'name email')
+            .sort({ createdAt: -1 });
+        res.json(transactions);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const deleteTransaction = async (req, res) => {
     try {
         const transaction = await Transaction.findById(req.params.id);

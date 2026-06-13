@@ -40,6 +40,8 @@ const BillingPage = () => {
   const [shippingAmount, setShippingAmount] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [printType, setPrintType] = useState('a4');
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -86,7 +88,15 @@ const BillingPage = () => {
   };
 
   const handlePrint = () => {
-    window.print();
+    setShowPrintModal(true);
+  };
+
+  const triggerPrint = (type) => {
+    setPrintType(type);
+    setShowPrintModal(false);
+    setTimeout(() => {
+      window.print();
+    }, 150);
   };
 
   const addItem = (type) => {
@@ -615,108 +625,264 @@ const BillingPage = () => {
         </div>
       )}
 
+      {/* Print Options Modal */}
+      {showPrintModal && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 no-print">
+            <div className="w-full max-w-md bg-white rounded-[40px] p-8 md:p-10 text-center relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-slate-100">
+                <button
+                    onClick={() => setShowPrintModal(false)}
+                    className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
+                >
+                    <X size={24} />
+                </button>
+                <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">Select Print Format</h3>
+                <p className="text-slate-500 font-medium mb-8">Choose the layout that matches your printer</p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                    {/* A4 Invoice Option */}
+                    <button
+                        onClick={() => triggerPrint('a4')}
+                        className="flex flex-col items-center p-6 bg-slate-50 hover:bg-red-50/30 border border-slate-200 hover:border-red-500/30 rounded-[28px] transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                    >
+                        <div className="w-16 h-16 bg-red-100 group-hover:bg-red-500 rounded-2xl flex items-center justify-center text-red-600 group-hover:text-white transition-all mb-4 shadow-inner">
+                            <FileText size={28} />
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm mb-1 uppercase tracking-wider">A4 / A5</h4>
+                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                            Standard invoice layout
+                        </p>
+                    </button>
+
+                    {/* POS Receipt Option */}
+                    <button
+                        onClick={() => triggerPrint('pos')}
+                        className="flex flex-col items-center p-6 bg-slate-50 hover:bg-amber-50/30 border border-slate-200 hover:border-amber-500/30 rounded-[28px] transition-all group shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                    >
+                        <div className="w-16 h-16 bg-amber-100 group-hover:bg-amber-500 rounded-2xl flex items-center justify-center text-amber-600 group-hover:text-white transition-all mb-4 shadow-inner">
+                            <Printer size={28} />
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-sm mb-1 uppercase tracking-wider">POS Roll</h4>
+                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                            80mm thermal receipt
+                        </p>
+                    </button>
+                </div>
+
+                <button
+                    onClick={() => setShowPrintModal(false)}
+                    className="w-full py-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
+        </div>
+      )}
+
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
-      <div id="printable-invoice" className={`hidden print:block bg-white text-black font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}>
-          <div className="flex justify-between items-start mb-4 border-b-2 border-black pb-4">
-              <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white overflow-hidden">
-                      <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+      <div id="printable-invoice" className={`hidden print:block bg-white text-black ${printType === 'pos' ? 'print-pos-layout font-mono' : `font-sans ${billItems.length > 12 ? 'print-compact' : ''}`}`}>
+          {printType === 'pos' ? (
+              <div className="pos-receipt text-[11px] leading-tight max-w-[80mm] p-2 mx-auto">
+                  <div className="text-center mb-2">
+                      <h1 className="text-sm font-black uppercase tracking-tight">RTS PLASTICS</h1>
+                      <p className="text-[9px] font-bold uppercase">{user.storeName || t('mainUnit')}</p>
+                      <p className="text-[8px] text-slate-500">{new Date().toLocaleString()}</p>
                   </div>
-                  <div>
-                      <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
-                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
-                      <p className="text-[9px] text-slate-500 italic">{new Date().toLocaleString()}</p>
+                  
+                  <div className="border-t border-dashed border-black my-2"></div>
+                  
+                  <div className="space-y-1 mb-2">
+                      <div className="flex justify-between">
+                          <span>Invoice:</span>
+                          <span className="font-bold">#{invoiceId}</span>
+                      </div>
+                      <div className="flex justify-between">
+                          <span>Customer:</span>
+                          <span className="font-bold">{customer.name}</span>
+                      </div>
+                      {customer.phone && (
+                          <div className="flex justify-between">
+                              <span>Phone:</span>
+                              <span>{customer.phone}</span>
+                          </div>
+                      )}
+                      <div className="flex justify-between">
+                          <span>Billed By:</span>
+                          <span className="uppercase">{user.name}</span>
+                      </div>
                   </div>
-              </div>
-              <div className="text-right">
-                  <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
-                  <p className="text-xs font-bold">#{invoiceId}</p>
-              </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                  <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
-                  <p className="text-sm font-black">{customer.name}</p>
-                  <p className="text-xs font-bold text-slate-600">{customer.phone}</p>
-                  {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight">{customer.address}</p>}
-              </div>
-              <div className="flex flex-col justify-end text-right space-y-1">
-                  <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
-                  <p className="text-xs font-bold uppercase">{user.name}</p>
-              </div>
-          </div>
-
-          <div className="mb-4">
-              <table className="w-full text-left">
-                  <thead>
-                      <tr className="border-b-2 border-slate-900 bg-slate-50">
-                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
-                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
-                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
-                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
-                          <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
-                      </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  
+                  <div className="border-t border-dashed border-black my-2"></div>
+                  
+                  {/* Items List */}
+                  <div className="space-y-2 mb-2">
+                      <div className="flex justify-between font-bold">
+                          <span className="w-1/2">Item</span>
+                          <span className="w-1/4 text-center">Qty</span>
+                          <span className="w-1/4 text-right">Total</span>
+                      </div>
+                      <div className="border-t border-dotted border-black my-1"></div>
                       {billItems.map((item, idx) => (
-                          <tr key={idx} className="text-[11px] font-bold border-b border-slate-50">
-                              <td className="py-2 px-2 uppercase">{item.productName}</td>
-                              <td className="py-2 px-2 text-center">{item.quantity}</td>
-                              <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
-                              <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
-                              <td className="py-2 px-2 text-right">
-                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                              </td>
-                          </tr>
+                          <div key={idx} className="space-y-0.5">
+                              <div className="font-bold uppercase text-[10px]">{item.productName} ({item.type === 'sold' ? 'NEW' : 'SCRAP'})</div>
+                              <div className="flex justify-between text-[10px]">
+                                  <span className="text-slate-600 pl-2">
+                                      {item.quantity} {item.unit} x ₹{item.unitPrice.toFixed(2)}
+                                  </span>
+                                  <span className="font-bold">
+                                      {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                  </span>
+                              </div>
+                          </div>
                       ))}
-                  </tbody>
-              </table>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t-2 border-slate-900">
-              <div className="w-56 space-y-2">
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                      <span>{t('totalSales')}</span>
-                      <span>₹{totals.totalNew.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                      <span>{t('totalScrapBuy')}</span>
-                      <span>-₹{totals.totalWaste.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1">
-                      <span className="uppercase tracking-widest">{t('subtotal')}</span>
-                      <span>₹{totals.subtotal.toFixed(2)}</span>
-                  </div>
-                  {gstEnabled && (
-                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                          <span>{t('taxes')}</span>
-                          <span>₹{totals.tax.toFixed(2)}</span>
+                  
+                  <div className="border-t border-dashed border-black my-2"></div>
+                  
+                  {/* Totals */}
+                  <div className="space-y-1 text-right mb-4">
+                      <div className="flex justify-between">
+                          <span>Total Sales:</span>
+                          <span>₹{totals.totalNew.toFixed(2)}</span>
                       </div>
-                  )}
-                  {shippingEnabled && (
-                      <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
-                          <span>{t('shippingLogistics')}</span>
-                          <span>₹{totals.logistics.toFixed(2)}</span>
+                      <div className="flex justify-between">
+                          <span>Total Scrap Buy:</span>
+                          <span>-₹{totals.totalWaste.toFixed(2)}</span>
                       </div>
-                  )}
-                  <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2">
-                      <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
-                      <span>₹{totals.net.toFixed(2)}</span>
+                      <div className="border-t border-dotted border-black my-1"></div>
+                      <div className="flex justify-between font-bold">
+                          <span>Subtotal:</span>
+                          <span>₹{totals.subtotal.toFixed(2)}</span>
+                      </div>
+                      {gstEnabled && (
+                          <div className="flex justify-between">
+                              <span>GST (18%):</span>
+                              <span>₹{totals.tax.toFixed(2)}</span>
+                          </div>
+                      )}
+                      {shippingEnabled && (
+                          <div className="flex justify-between">
+                              <span>Shipping:</span>
+                              <span>₹{totals.logistics.toFixed(2)}</span>
+                          </div>
+                      )}
+                      <div className="border-t border-dashed border-black my-1"></div>
+                      <div className="flex justify-between text-xs font-black uppercase pt-1">
+                          <span>Net Receivable:</span>
+                          <span>₹{totals.net.toFixed(2)}</span>
+                      </div>
+                  </div>
+                  
+                  <div className="border-t border-dashed border-black my-2"></div>
+                  
+                  <div className="text-center italic mt-2 text-[9px]">
+                      <p>Thank you for choosing RTS Plastics!</p>
+                      <p className="text-[8px] text-slate-500 mt-1">Generated by PlastiCore Billing</p>
                   </div>
               </div>
-          </div>
+          ) : (
+              <div className="p-6">
+                  <div className="flex justify-between items-start mb-4 border-b-2 border-black pb-4">
+                      <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-white overflow-hidden">
+                              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                          </div>
+                          <div>
+                              <h1 className="text-2xl font-black uppercase tracking-tighter">RTS Plastics</h1>
+                              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-tight">{user.storeName || t('mainUnit')}</p>
+                              <p className="text-[9px] text-slate-500 italic">{new Date().toLocaleString()}</p>
+                          </div>
+                      </div>
+                      <div className="text-right">
+                          <h2 className="text-lg font-black uppercase tracking-tight">{t('printInvoice')}</h2>
+                          <p className="text-xs font-bold">#{invoiceId}</p>
+                      </div>
+                  </div>
 
-          <div className="mt-10 pt-4 border-t border-slate-100 text-center">
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
-          </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                          <p className="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-widest">{t('customer')}</p>
+                          <p className="text-sm font-black">{customer.name}</p>
+                          <p className="text-xs font-bold text-slate-600">{customer.phone}</p>
+                          {customer.address && <p className="text-[10px] text-slate-500 mt-1 leading-tight">{customer.address}</p>}
+                      </div>
+                      <div className="flex flex-col justify-end text-right space-y-1">
+                          <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{t('billedBy') || 'Billed By'}</p>
+                          <p className="text-xs font-bold uppercase">{user.name}</p>
+                      </div>
+                  </div>
+
+                  <div className="mb-4">
+                      <table className="w-full text-left">
+                          <thead>
+                              <tr className="border-b-2 border-slate-900 bg-slate-50">
+                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest">{t('item')}</th>
+                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('qty')}</th>
+                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-center">{t('unit')}</th>
+                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('price')}</th>
+                                  <th className="py-2 px-2 text-[9px] font-black uppercase tracking-widest text-right">{t('subtotalTable')}</th>
+                              </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                              {billItems.map((item, idx) => (
+                                  <tr key={idx} className="text-[11px] font-bold border-b border-slate-50">
+                                      <td className="py-2 px-2 uppercase">{item.productName}</td>
+                                      <td className="py-2 px-2 text-center">{item.quantity}</td>
+                                      <td className="py-2 px-2 text-center uppercase">{item.unit}</td>
+                                      <td className="py-2 px-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
+                                      <td className="py-2 px-2 text-right">
+                                          {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                      </td>
+                                  </tr>
+                              ))}
+                          </tbody>
+                      </table>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t-2 border-slate-900">
+                      <div className="w-56 space-y-2">
+                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
+                              <span>{t('totalSales')}</span>
+                              <span>₹{totals.totalNew.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
+                              <span>{t('totalScrapBuy')}</span>
+                              <span>-₹{totals.totalWaste.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[11px] font-black border-t border-slate-100 pt-1">
+                              <span className="uppercase tracking-widest">{t('subtotal')}</span>
+                              <span>₹{totals.subtotal.toFixed(2)}</span>
+                          </div>
+                          {gstEnabled && (
+                              <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
+                                  <span>{t('taxes')}</span>
+                                  <span>₹{totals.tax.toFixed(2)}</span>
+                              </div>
+                          )}
+                          {shippingEnabled && (
+                              <div className="flex justify-between items-center text-[10px] font-bold uppercase text-slate-500">
+                                  <span>{t('shippingLogistics')}</span>
+                                  <span>₹{totals.logistics.toFixed(2)}</span>
+                              </div>
+                          )}
+                          <div className="flex justify-between items-center text-base font-black border-t-2 border-black pt-2 mt-2">
+                              <span className="uppercase tracking-tighter">{t('netReceivable')}</span>
+                              <span>₹{totals.net.toFixed(2)}</span>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="mt-10 pt-4 border-t border-slate-100 text-center">
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Thank you for choosing RTS Plastics</p>
+                  </div>
+              </div>
+          )}
       </div>
 
       <style>{`
           @media print {
               @page {
-                  size: A5;
-                  margin: 5mm;
+                  size: ${printType === 'pos' ? '80mm auto' : 'A5'};
+                  margin: ${printType === 'pos' ? '0' : '5mm'};
               }
               body * {
                   visibility: hidden !important;
@@ -730,9 +896,9 @@ const BillingPage = () => {
                   position: absolute !important;
                   left: 0 !important;
                   top: 0 !important;
-                  width: 100% !important;
+                  width: ${printType === 'pos' ? '80mm' : '100%'} !important;
                   display: block !important;
-                  padding: 0 !important;
+                  padding: ${printType === 'pos' ? '0' : '0'} !important;
                   margin: 0 !important;
               }
               .print-compact {
