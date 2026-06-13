@@ -37,9 +37,23 @@ const InventoryPage = () => {
     stock: 0
   });
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+
   useEffect(() => {
     fetchProducts();
   }, [user.token]);
+
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                          (p._id && p._id.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
+  const lowStockCount = products.filter(p => p.stock < 10).length;
 
   const fetchProducts = async () => {
     try {
@@ -138,6 +152,8 @@ const InventoryPage = () => {
             <input
                 type="text"
                 placeholder={t('searchAnalytics')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-red-500/10 text-slate-700 text-sm font-medium transition-all shadow-sm"
             />
         </div>
@@ -145,8 +161,9 @@ const InventoryPage = () => {
             {['all', 'new', 'waste'].map((cat) => (
                 <button
                     key={cat}
+                    onClick={() => setActiveCategory(cat)}
                     className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all border ${
-                        cat === 'all'
+                        cat === activeCategory
                         ? 'bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/20'
                         : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
                     }`}
@@ -160,9 +177,9 @@ const InventoryPage = () => {
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {[
-            { label: t('totalStockValue'), value: '₹1,24,500', icon: TrendingUp, color: 'red' },
-            { label: t('lowStockItems'), value: '24 Items', icon: TrendingDown, color: 'amber' },
-            { label: t('totalCategories'), value: '12 Classes', icon: Package, color: 'emerald' },
+            { label: t('totalStockValue'), value: `₹${totalStockValue.toLocaleString('en-IN')}`, icon: TrendingUp, color: 'red' },
+            { label: t('lowStockItems'), value: `${lowStockCount} Items`, icon: TrendingDown, color: 'amber' },
+            { label: t('totalCategories'), value: `${products.length} Items`, icon: Package, color: 'emerald' },
             { label: t('activeOrders'), value: '18 In-Transit', icon: ChevronRight, color: 'purple' },
         ].map((stat, idx) => (
             <div key={idx} className="bg-white p-4 md:p-6 border border-slate-200 rounded-2xl md:rounded-3xl flex items-center justify-between shadow-sm">
@@ -188,6 +205,8 @@ const InventoryPage = () => {
                 <input
                     type="text"
                     placeholder={t('searchProductName')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="bg-white border border-slate-200 rounded-xl py-2 pl-10 pr-4 text-xs font-medium text-slate-700 outline-none focus:ring-1 focus:ring-red-500/30 w-64 shadow-sm"
                 />
             </div>
@@ -195,7 +214,7 @@ const InventoryPage = () => {
 
         {/* Mobile Card View */}
         <div className="md:hidden divide-y divide-slate-100">
-          {products.map((p) => (
+          {filteredProducts.map((p) => (
             <div key={p._id} className="p-5 flex items-center justify-between hover:bg-slate-50 active:bg-slate-100 transition-colors">
               <div className="flex items-center space-x-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black ${p.category === 'new' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
@@ -218,7 +237,7 @@ const InventoryPage = () => {
               </div>
             </div>
           ))}
-          {products.length === 0 && (
+          {filteredProducts.length === 0 && (
             <div className="p-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic opacity-50">{t('noProductsAdded')}</div>
           )}
         </div>
@@ -236,7 +255,7 @@ const InventoryPage = () => {
               </tr>
             </thead>
               <tbody className="divide-y divide-slate-100">
-                  {products.map((p) => (
+                  {filteredProducts.map((p) => (
                       <tr key={p._id} className="hover:bg-slate-50/50 transition-colors group">
                           <td className="px-8 py-6">
                               <div className="flex items-center space-x-4">

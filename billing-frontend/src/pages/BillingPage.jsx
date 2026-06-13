@@ -148,11 +148,11 @@ const BillingPage = () => {
   const totals = calculateTotals();
 
   const handleSubmit = async () => {
-    if (!customer.name || billItems.length === 0) return alert(t('fillDetailsError'));
+    if (!customer.name || !customer.name.trim() || billItems.length === 0) return alert(t('fillDetailsError'));
     
     // Check if customer is just placeholder and fallback to "Thangavel"
     let activeCustomer = customer;
-    if (customer.name === t('selectCustomerTitle') || customer._id === '') {
+    if (customer.name === t('selectCustomerTitle')) {
         const defaultCust = customers.find(c => c.name.toLowerCase().includes('thangavel')) || customers[0];
         if (defaultCust) {
             activeCustomer = defaultCust;
@@ -206,7 +206,7 @@ const BillingPage = () => {
 
   const getPrintConfig = () => {
     const len = billItems.length;
-    let cols = 1;
+    const cols = 1;
     let fontSize = '11px';
     let thFontSize = '9px';
     let paddingY = '8px';
@@ -226,10 +226,9 @@ const BillingPage = () => {
     let subtitleSize = '14px';
 
     if (len > 500) {
-      cols = 6;
-      fontSize = '4.2px';
-      thFontSize = '3.8px';
-      paddingY = '0.5px';
+      fontSize = '3.5px';
+      thFontSize = '3.2px';
+      paddingY = '0.2px';
       paddingX = '1px';
       headerMb = '2px';
       headerPb = '2px';
@@ -241,13 +240,12 @@ const BillingPage = () => {
       totalsContainerWidth = '140px';
       totalsRowSpacing = '1px';
       thinBorders = true;
-      headerTitleSize = '11px';
-      subtitleSize = '8px';
+      headerTitleSize = '10px';
+      subtitleSize = '7px';
     } else if (len > 250) {
-      cols = 5;
-      fontSize = '5.5px';
-      thFontSize = '5.0px';
-      paddingY = '1px';
+      fontSize = '4.5px';
+      thFontSize = '4.0px';
+      paddingY = '0.4px';
       paddingX = '2px';
       headerMb = '4px';
       headerPb = '4px';
@@ -259,13 +257,12 @@ const BillingPage = () => {
       totalsContainerWidth = '160px';
       totalsRowSpacing = '2px';
       thinBorders = true;
-      headerTitleSize = '13px';
-      subtitleSize = '9px';
+      headerTitleSize = '12px';
+      subtitleSize = '8px';
     } else if (len > 120) {
-      cols = 4;
-      fontSize = '6.8px';
-      thFontSize = '6.2px';
-      paddingY = '1.5px';
+      fontSize = '6.0px';
+      thFontSize = '5.5px';
+      paddingY = '0.8px';
       paddingX = '3px';
       headerMb = '6px';
       headerPb = '6px';
@@ -277,13 +274,12 @@ const BillingPage = () => {
       totalsContainerWidth = '180px';
       totalsRowSpacing = '3px';
       thinBorders = true;
-      headerTitleSize = '15px';
-      subtitleSize = '10px';
+      headerTitleSize = '14px';
+      subtitleSize = '9px';
     } else if (len > 50) {
-      cols = 3;
-      fontSize = '8.5px';
-      thFontSize = '8.0px';
-      paddingY = '2px';
+      fontSize = '8.0px';
+      thFontSize = '7.5px';
+      paddingY = '1.5px';
       paddingX = '4px';
       headerMb = '8px';
       headerPb = '8px';
@@ -297,12 +293,11 @@ const BillingPage = () => {
       thinBorders = true;
       headerTitleSize = '18px';
       subtitleSize = '11px';
-    } else if (len > 15) {
-      cols = 2;
-      fontSize = '10.0px';
+    } else if (len > 25) {
+      fontSize = '9.5px';
       thFontSize = '9.0px';
-      paddingY = '3.5px';
-      paddingX = '5px';
+      paddingY = '3.0px';
+      paddingX = '6px';
       headerMb = '12px';
       headerPb = '12px';
       infoGridMb = '12px';
@@ -314,10 +309,9 @@ const BillingPage = () => {
       totalsContainerWidth = '220px';
       totalsRowSpacing = '6px';
       thinBorders = false;
-      headerTitleSize = '22px';
+      headerTitleSize = '20px';
       subtitleSize = '12px';
     } else {
-      cols = 1;
       fontSize = '12px';
       thFontSize = '10px';
       paddingY = '6px';
@@ -395,13 +389,25 @@ const BillingPage = () => {
                 <div className="flex flex-col md:flex-row items-start md:items-center md:space-x-6 space-y-2 md:space-y-0">
                     <div>
                         <p className="text-[8px] md:text-[9px] font-black text-red-500 uppercase tracking-[0.2em] mb-1">{t('liveTransaction')}</p>
-                        <h3 className="text-xl md:text-2xl font-black text-white tracking-tighter leading-none truncate max-w-[200px]">{customer.name}</h3>
+                        <input
+                            type="text"
+                            value={customer.name === t('selectCustomerTitle') ? '' : customer.name}
+                            onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                            placeholder={t('selectCustomerTitle')}
+                            className="bg-transparent border-b border-dashed border-slate-700 hover:border-slate-500 focus:border-red-500 text-xl md:text-2xl font-black text-white tracking-tighter leading-none focus:outline-none w-full max-w-[250px] transition-all pb-1"
+                        />
                     </div>
 
                     <div className="flex items-center space-x-3 md:space-x-4 md:pl-6 md:border-l border-slate-700">
                         <div className="flex items-center space-x-2 text-slate-400">
                             <User size={12} className="text-red-500 md:w-[14px] md:h-[14px]" />
-                            <span className="text-[10px] md:text-[11px] font-bold tracking-tight">{customer.phone || t('noPhone')}</span>
+                            <input
+                                type="text"
+                                value={customer.phone}
+                                onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                                placeholder={t('phoneNumber')}
+                                className="bg-transparent border-b border-dashed border-slate-700 hover:border-slate-500 focus:border-red-500 text-[10px] md:text-[11px] font-bold text-slate-200 tracking-tight focus:outline-none w-28 transition-all pb-0.5"
+                            />
                         </div>
                         <div className="flex items-center space-x-2 text-slate-400">
                             <Hash size={12} className="text-red-500 md:w-[14px] md:h-[14px]" />
@@ -822,7 +828,6 @@ const BillingPage = () => {
       {/* Printable Invoice - Hidden in UI, Visible in Print */}
       {(() => {
           const printConfig = getPrintConfig();
-          const chunkedItems = chunkArray(billItems, printConfig.cols);
           return (
               <div 
                 id="printable-invoice" 
@@ -872,58 +877,30 @@ const BillingPage = () => {
                       </div>
 
                       <div className="invoice-table-wrapper" style={{ marginBottom: printConfig.tableMb }}>
-                          <div className="flex gap-4 w-full items-start">
-                              {chunkedItems.map((chunk, colIdx) => (
-                                  <div key={colIdx} className="flex-1">
-                                      <table className="w-full text-left">
-                                          <thead>
-                                              <tr className="border-b border-slate-900 bg-slate-50 invoice-table-hdr">
-                                                  {printConfig.cols === 1 ? (
-                                                      <>
-                                                          <th className="py-1 px-1 font-black uppercase tracking-widest" style={{ fontSize: printConfig.thFontSize }}>{t('item')}</th>
-                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('qty')}</th>
-                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('unit')}</th>
-                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('price')}</th>
-                                                          <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('subtotalTable')}</th>
-                                                      </>
-                                                  ) : (
-                                                      <>
-                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest" style={{ fontSize: printConfig.thFontSize }}>{t('item')}</th>
-                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize }}>{t('qty')}</th>
-                                                          <th className="py-0.5 px-0.5 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize }}>{t('subtotalTable')}</th>
-                                                      </>
-                                                  )}
-                                              </tr>
-                                          </thead>
-                                          <tbody className="divide-y divide-slate-100">
-                                              {chunk.map((item, idx) => (
-                                                  <tr key={idx} className="font-bold border-b border-slate-50 invoice-table-row">
-                                                      {printConfig.cols === 1 ? (
-                                                          <>
-                                                              <td className="uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.productName}</td>
-                                                              <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
-                                                              <td className="text-center uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.unit}</td>
-                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>₹{item.unitPrice.toFixed(2)}</td>
-                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>
-                                                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                                                              </td>
-                                                          </>
-                                                      ) : (
-                                                          <>
-                                                              <td className="uppercase break-words leading-tight" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}`, maxWidth: `${180 / printConfig.cols - 15}mm` }}>{item.productName}</td>
-                                                              <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
-                                                              <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>
-                                                                  {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
-                                                              </td>
-                                                          </>
-                                                      )}
-                                                  </tr>
-                                              ))}
-                                          </tbody>
-                                      </table>
-                                  </div>
-                              ))}
-                          </div>
+                          <table className="w-full text-left print-table">
+                              <thead>
+                                  <tr className="border-b border-slate-900 bg-slate-50 invoice-table-hdr">
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-left" style={{ fontSize: printConfig.thFontSize, width: '50%' }}>{t('item')}</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize, width: '10%' }}>{t('qty')}</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-center" style={{ fontSize: printConfig.thFontSize, width: '10%' }}>{t('unit')}</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize, width: '15%' }}>{t('price')}</th>
+                                      <th className="py-1 px-1 font-black uppercase tracking-widest text-right" style={{ fontSize: printConfig.thFontSize, width: '15%' }}>{t('subtotalTable')}</th>
+                                  </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                  {billItems.map((item, idx) => (
+                                      <tr key={idx} className="font-bold border-b border-slate-50 invoice-table-row">
+                                          <td className="uppercase break-words leading-tight" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.productName}</td>
+                                          <td className="text-center" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.quantity}</td>
+                                          <td className="text-center uppercase" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>{item.unit}</td>
+                                          <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>₹{item.unitPrice.toFixed(2)}</td>
+                                          <td className="text-right" style={{ padding: `${printConfig.paddingY} ${printConfig.paddingX}` }}>
+                                              {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
                       </div>
 
                       <div className="invoice-totals-wrapper flex justify-end pt-2 border-t border-slate-900">
@@ -1022,9 +999,12 @@ const BillingPage = () => {
                   break-inside: avoid !important;
               }
               
-              /* Remove extra padding around invoice container inside 0.2cm margin */
+              /* Remove extra padding around invoice container inside 0.2cm margin, but leave top spacing */
               #printable-invoice .invoice-container {
-                  padding: 0 !important;
+                  padding-top: 15px !important;
+                  padding-bottom: 0 !important;
+                  padding-left: 0 !important;
+                  padding-right: 0 !important;
               }
               
               /* Thin borders in print */
@@ -1036,6 +1016,15 @@ const BillingPage = () => {
               #printable-invoice .border-b {
                   border-color: #e2e8f0 !important;
                   border-width: 1px !important;
+              }
+
+              /* Print table properties to maintain compact columns */
+              #printable-invoice .print-table {
+                  width: 100% !important;
+                  max-width: 600px !important;
+                  table-layout: fixed !important;
+                  margin-left: 0 !important;
+                  margin-right: auto !important;
               }
 
               /* A4 Dynamic Scaling to fit up to 100 items on a single page */
