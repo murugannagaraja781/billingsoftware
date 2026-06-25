@@ -1012,16 +1012,14 @@ const BillingPage = () => {
                                   <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>{invoiceHeader.companyName}</h1>
                                   <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{invoiceHeader.storeSubtitle}</p>
                                   <p className="text-slate-500 leading-tight store-address" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)`, marginTop: '4px' }}>
-                                      {invoiceHeader.address} | {invoiceHeader.contact}<br />
-                                      {invoiceHeader.taxId}
+                                      {invoiceHeader.contact}
                                   </p>
                               </div>
                           </div>
                           <div className="text-right flex flex-col items-end space-y-0.5" style={{ fontSize: printConfig.fontSize }}>
-                              <h2 className="font-black uppercase tracking-tight mb-1" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>{t('printInvoice')}</h2>
-                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Invoice No:</span> #{invoiceId}</p>
+                              <h2 className="font-black uppercase tracking-tight mb-1" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>Estimate</h2>
+                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Estimate No:</span> #{invoiceId}</p>
                               <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Date:</span> {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
-                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Due Date:</span> {new Date(Date.now() + 15*24*60*60*1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                           </div>
                       </div>
 
@@ -1033,7 +1031,6 @@ const BillingPage = () => {
                               <p className="font-black uppercase text-slate-400 tracking-widest" style={{ fontSize: `calc(${printConfig.fontSize} * 0.75)`, marginBottom: '2px' }}>{t('customer')}</p>
                               <p className="font-black customer-name" style={{ fontSize: `calc(${printConfig.fontSize} * 1.15)` }}>{customer.name}</p>
                               <p className="font-bold text-slate-600 customer-phone" style={{ fontSize: printConfig.fontSize }}>{customer.phone}</p>
-                              {customer.address && <p className="text-slate-500 leading-tight customer-address" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)`, marginTop: '2px' }}>{customer.address}</p>}
                           </div>
                           <div className="billed-by-card flex flex-col justify-end text-right space-y-1">
                               <p className="font-black uppercase text-slate-400 tracking-widest" style={{ fontSize: `calc(${printConfig.fontSize} * 0.75)` }}>{t('billedBy') || 'Billed By'}</p>
@@ -1073,11 +1070,6 @@ const BillingPage = () => {
                       <div className="invoice-totals-wrapper flex justify-between items-start pt-2 border-t border-slate-900">
                           {/* Bottom Left: Payment Details */}
                           <div className="payment-details-wrapper text-left text-slate-600 font-bold" style={{ fontSize: `calc(${printConfig.fontSize} * 0.95)`, maxWidth: '280px', marginTop: '4px' }}>
-                              <p className="font-black uppercase tracking-widest text-slate-900" style={{ fontSize: `calc(${printConfig.fontSize} * 0.85)`, marginBottom: '4px' }}>Payment/Bank Details:</p>
-                              <p className="font-semibold text-slate-700">Bank Name: {invoiceHeader.bankName}</p>
-                              <p className="font-semibold text-slate-700">A/C No: {invoiceHeader.bankAccNo}</p>
-                              <p className="font-semibold text-slate-700">IFSC: {invoiceHeader.bankIfsc}</p>
-                              <p className="text-slate-500 italic mt-1 font-medium">{invoiceHeader.paymentTerms}</p>
                           </div>
 
                           {/* Bottom Right: Totals */}
