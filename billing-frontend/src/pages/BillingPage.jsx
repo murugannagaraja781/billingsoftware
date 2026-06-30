@@ -1149,13 +1149,14 @@ const BillingPage = () => {
       <style>{`
           @media print {
               html, body {
-                  height: 100% !important;
-                  overflow: hidden !important;
+                  height: auto !important;
+                  min-height: auto !important;
+                  overflow: initial !important;
                   margin: 0 !important;
                   padding: 0 !important;
               }
               @page {
-                  size: A4;
+                  size: auto;
                   margin: 0 !important;
               }
               body * {
@@ -1167,7 +1168,7 @@ const BillingPage = () => {
                   visibility: visible !important;
               }
               #printable-invoice {
-                  position: absolute !important;
+                  position: relative !important;
                   left: 0 !important;
                   top: 0 !important;
                   width: 100% !important;
@@ -1182,10 +1183,10 @@ const BillingPage = () => {
               
               /* Set padding on print container to prevent cut-off since page margin is 0 */
               #printable-invoice .invoice-container {
-                  padding-top: 15mm !important;
-                  padding-bottom: 15mm !important;
-                  padding-left: 15mm !important;
-                  padding-right: 15mm !important;
+                  padding-top: 6mm !important;
+                  padding-bottom: 6mm !important;
+                  padding-left: 6mm !important;
+                  padding-right: 6mm !important;
                   box-sizing: border-box !important;
               }
               
