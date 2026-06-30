@@ -1029,15 +1029,10 @@ const BillingPage = () => {
                               <div>
                                   <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>{invoiceHeader.companyName}</h1>
                                   <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{invoiceHeader.storeSubtitle}</p>
-                                  <p className="text-slate-500 leading-tight store-address" style={{ fontSize: `calc(${printConfig.fontSize} * 0.9)`, marginTop: '4px' }}>
-                                      {invoiceHeader.contact}
-                                  </p>
                               </div>
                           </div>
                           <div className="text-right flex flex-col items-end space-y-0.5" style={{ fontSize: printConfig.fontSize }}>
                               <h2 className="font-black uppercase tracking-tight mb-1" style={{ fontSize: `calc(${printConfig.headerTitleSize} * 0.8)` }}>Estimate</h2>
-                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Estimate No:</span> #{invoiceId}</p>
-                              <p className="font-bold invoice-meta-row"><span className="text-slate-400 uppercase tracking-wider text-[8px]">Date:</span> {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                           </div>
                       </div>
 
@@ -1162,7 +1157,7 @@ const BillingPage = () => {
               }
               @page {
                   size: A4;
-                  margin: 0.2cm !important;
+                  margin: 0 !important;
               }
               body * {
                   visibility: hidden !important;
@@ -1186,12 +1181,13 @@ const BillingPage = () => {
                   break-inside: avoid !important;
               }
               
-              /* Remove extra padding around invoice container inside 0.2cm margin, but leave top spacing */
+              /* Set padding on print container to prevent cut-off since page margin is 0 */
               #printable-invoice .invoice-container {
-                  padding-top: 15px !important;
-                  padding-bottom: 0 !important;
-                  padding-left: 0 !important;
-                  padding-right: 0 !important;
+                  padding-top: 15mm !important;
+                  padding-bottom: 15mm !important;
+                  padding-left: 15mm !important;
+                  padding-right: 15mm !important;
+                  box-sizing: border-box !important;
               }
               
               /* Force webkit and standard browsers to render background colors in print */
