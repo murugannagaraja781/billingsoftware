@@ -21,8 +21,11 @@ import API_URL from '../config';
 const Dashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem('rts_transactions');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(transactions.length === 0);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   const fetchTransactions = async () => {
@@ -31,6 +34,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setTransactions(data);
+      localStorage.setItem('rts_transactions', JSON.stringify(data));
     } catch (error) {
       console.error(error);
     } finally {

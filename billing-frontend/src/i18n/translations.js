@@ -225,7 +225,14 @@ export const resources = {
             "accountNo": "Account No",
             "ifscCode": "IFSC Code",
             "termsNote": "Terms / Note",
-            "applyDetails": "Apply Details"
+            "applyDetails": "Apply Details",
+            "collectedWaste": "Collected Waste",
+            "collectedWasteDesc": "Track scrap collections and manage waste inventory",
+            "noWasteCollected": "No waste items collected yet",
+            "wasteCollectionHistory": "Waste Collection History",
+            "ratePerKg": "Rate / KG",
+            "totalWasteStock": "Total Waste Stock",
+            "lowWasteStock": "Low Waste Stock"
         }
     },
     ta: {
@@ -464,7 +471,14 @@ export const resources = {
             "accountNo": "கணக்கு எண்",
             "ifscCode": "IFSC குறியீடு",
             "termsNote": "விதிமுறைகள் / குறிப்பு",
-            "applyDetails": "விவரங்களைச் சேமி"
+            "applyDetails": "விவரங்களைச் சேமி",
+            "collectedWaste": "சேகரிக்கப்பட்ட கழிவுகள்",
+            "collectedWasteDesc": "கழிவு சேகரிப்புகளைக் கண்காணித்து கழிவு இருப்பை நிர்வகிக்கவும்",
+            "noWasteCollected": "கழிவுப் பொருட்கள் ஏதும் இன்னும் சேகரிக்கப்படவில்லை",
+            "wasteCollectionHistory": "கழிவு சேகரிப்பு வரலாறு",
+            "ratePerKg": "கிலோ விலை",
+            "totalWasteStock": "மொத்த கழிவு இருப்பு",
+            "lowWasteStock": "குறைந்த கழிவு இருப்பு"
         }
     }
 };

@@ -17,8 +17,11 @@ import API_URL from '../config';
 const StorePage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [stores, setStores] = useState(() => {
+    const saved = localStorage.getItem('rts_stores');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(stores.length === 0);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedStore, setSelectedStore] = useState(null);
@@ -34,6 +37,7 @@ const StorePage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setStores(data);
+      localStorage.setItem('rts_stores', JSON.stringify(data));
     } catch (error) {
       console.error(error);
     } finally {

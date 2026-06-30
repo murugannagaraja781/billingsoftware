@@ -28,4 +28,8 @@ const transactionSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
 }, { timestamps: true });
 
+transactionSchema.index({ storeId: 1 });
+transactionSchema.index({ managedBy: 1 });
+transactionSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Transaction', transactionSchema);

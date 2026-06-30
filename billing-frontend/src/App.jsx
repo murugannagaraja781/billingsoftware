@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import InventoryPage from './pages/InventoryPage';
 import StorePage from './pages/StorePage';
 import UserPage from './pages/UserPage';
+import CollectedWastePage from './pages/CollectedWastePage';
 import { Lock, Mail, ChevronRight, Check, Sun, Moon, Bell } from 'lucide-react';
 import axios from 'axios';
 import API_URL from './config';
@@ -283,6 +284,7 @@ const App = () => {
                 <Route path="/" element={<RoleBasedHome />} />
                 <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
                 <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
+                <Route path="/collected-waste" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><CollectedWastePage /></MainLayout></ProtectedRoute>} />
                 <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
                 <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />

@@ -11,7 +11,8 @@ import {
   ChevronRight,
   Settings,
   HelpCircle,
-  FileText
+  FileText,
+  Recycle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -35,6 +36,7 @@ const Sidebar = () => {
         { name: t('dashboard'), icon: LayoutDashboard, path: '/', roles: ['super_admin', 'admin'] },
         { name: t('billing'), icon: Receipt, path: '/billing' },
         { name: t('manageInventory'), icon: Package, path: '/inventory', roles: ['super_admin', 'admin'] },
+        { name: t('collectedWaste'), icon: Recycle, path: '/collected-waste', roles: ['super_admin', 'admin'] },
       ]
     },
     {

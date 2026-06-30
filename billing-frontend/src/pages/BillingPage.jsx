@@ -26,9 +26,18 @@ import API_URL from '../config';
 const BillingPage = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [customer, setCustomer] = useState({ name: t('selectCustomerTitle'), phone: '', _id: '' });
-  const [customers, setCustomers] = useState([]);
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('rts_products');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [customer, setCustomer] = useState(() => {
+    const saved = localStorage.getItem('rts_billing_customer');
+    return saved ? JSON.parse(saved) : { name: t('selectCustomerTitle'), phone: '', _id: '' };
+  });
+  const [customers, setCustomers] = useState(() => {
+    const saved = localStorage.getItem('rts_customers');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showNewCustModal, setShowNewCustModal] = useState(false);
   const [newCustForm, setNewCustForm] = useState({ name: '', phone: '9876543210', address: '', gstNumber: '' });
@@ -40,16 +49,19 @@ const BillingPage = () => {
   const [shippingAmount, setShippingAmount] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
   const [invoiceId] = useState(`TRX-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
-  const [invoiceHeader, setInvoiceHeader] = useState({
-    companyName: 'RTS Plastics',
-    storeSubtitle: 'Main Plastic Factory',
-    address: 'Industrial Area 4, Chennai, Tamil Nadu, India',
-    contact: 'Tel: +91 44 2250 1234 | Email: billing@rtsplastics.in',
-    taxId: 'GSTIN: 33AAAAA1111A1Z1',
-    bankName: 'State Bank of India',
-    bankAccNo: '31234567890',
-    bankIfsc: 'SBIN0001234',
-    paymentTerms: 'Terms: Net 15 days'
+  const [invoiceHeader, setInvoiceHeader] = useState(() => {
+    const saved = localStorage.getItem('rts_invoice_header');
+    return saved ? JSON.parse(saved) : {
+      companyName: 'RTS Plastics',
+      storeSubtitle: 'Main Plastic Factory',
+      address: 'Industrial Area 4, Chennai, Tamil Nadu, India',
+      contact: 'Tel: +91 44 2250 1234 | Email: billing@rtsplastics.in',
+      taxId: 'GSTIN: 33AAAAA1111A1Z1',
+      bankName: 'State Bank of India',
+      bankAccNo: '31234567890',
+      bankIfsc: 'SBIN0001234',
+      paymentTerms: 'Terms: Net 15 days'
+    };
   });
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
@@ -64,14 +76,17 @@ const BillingPage = () => {
       const { data } = await axios.get(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
+      localStorage.setItem('rts_stores', JSON.stringify(data));
       if (user.storeId && data.length > 0) {
         const myStore = data.find(s => s._id === user.storeId);
         if (myStore) {
-          setInvoiceHeader(prev => ({
-            ...prev,
+          const updatedHeader = {
+            ...invoiceHeader,
             storeSubtitle: myStore.name,
-            address: myStore.location || prev.address
-          }));
+            address: myStore.location || invoiceHeader.address
+          };
+          setInvoiceHeader(updatedHeader);
+          localStorage.setItem('rts_invoice_header', JSON.stringify(updatedHeader));
         }
       }
     } catch (error) {
@@ -83,6 +98,7 @@ const BillingPage = () => {
     try {
       const { data } = await axios.get(`${API_URL}/api/products`);
       setProducts(data);
+      localStorage.setItem('rts_products', JSON.stringify(data));
     } catch (error) {
       console.error(error);
     }
@@ -94,9 +110,11 @@ const BillingPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setCustomers(data);
+      localStorage.setItem('rts_customers', JSON.stringify(data));
       if (data.length > 0 && (customer.name === t('selectCustomerTitle') || customer._id === '')) {
           const defaultCust = data.find(c => c.name.toLowerCase().includes('thangavel')) || data[0];
           setCustomer(defaultCust);
+          localStorage.setItem('rts_billing_customer', JSON.stringify(defaultCust));
       }
     } catch (error) {
       console.error(error);

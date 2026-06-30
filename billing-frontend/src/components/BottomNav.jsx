@@ -6,7 +6,8 @@ import {
   Receipt,
   Store,
   User as UserIcon,
-  LogOut
+  LogOut,
+  Recycle
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +20,7 @@ const BottomNav = () => {
     { name: t('dashboard'), icon: LayoutDashboard, path: '/', roles: ['super_admin', 'admin'] },
     { name: t('billing'), icon: Receipt, path: '/billing' },
     { name: t('products'), icon: Package, path: '/inventory', roles: ['super_admin', 'admin'] },
+    { name: t('collectedWaste'), icon: Recycle, path: '/collected-waste', roles: ['super_admin', 'admin'] },
     { name: t('stores'), icon: Store, path: '/stores', roles: ['super_admin', 'admin'] },
   ];
 

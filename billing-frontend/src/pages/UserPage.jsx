@@ -18,9 +18,15 @@ import API_URL from '../config';
 const UserPage = () => {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState(() => {
+    const saved = localStorage.getItem('rts_users');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [stores, setStores] = useState(() => {
+    const saved = localStorage.getItem('rts_stores');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(users.length === 0 || stores.length === 0);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -40,6 +46,8 @@ const UserPage = () => {
       });
       setUsers(usersRes.data);
       setStores(storesRes.data);
+      localStorage.setItem('rts_users', JSON.stringify(usersRes.data));
+      localStorage.setItem('rts_stores', JSON.stringify(storesRes.data));
     } catch (error) {
       console.error(error);
     } finally {

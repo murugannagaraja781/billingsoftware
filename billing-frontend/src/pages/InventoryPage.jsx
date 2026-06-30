@@ -20,8 +20,11 @@ import API_URL from '../config';
 const InventoryPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('rts_products');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [loading, setLoading] = useState(products.length === 0);
   const [showModal, setShowModal] = useState(false);
   const [showProductModal, setShowProductModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
@@ -59,6 +62,7 @@ const InventoryPage = () => {
     try {
       const { data } = await axios.get(`${API_URL}/api/products`);
       setProducts(data);
+      localStorage.setItem('rts_products', JSON.stringify(data));
     } catch (error) {
       console.error(error);
     } finally {
