@@ -1028,7 +1028,6 @@ const BillingPage = () => {
                               )}
                               <div>
                                   <h1 className="font-black uppercase tracking-tighter" style={{ fontSize: printConfig.headerTitleSize }}>{invoiceHeader.companyName}</h1>
-                                  <p className="font-bold text-slate-600 uppercase tracking-widest leading-tight store-subtitle" style={{ fontSize: printConfig.subtitleSize }}>{invoiceHeader.storeSubtitle}</p>
                               </div>
                           </div>
                           <div className="text-right flex flex-col items-end space-y-0.5" style={{ fontSize: printConfig.fontSize }}>
