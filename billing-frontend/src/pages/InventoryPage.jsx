@@ -34,11 +34,11 @@ const InventoryPage = () => {
   const [productForm, setProductForm] = useState({
     name: '',
     category: 'new',
-    buyPrice: 0,
-    price: 0,
+    buyPrice: '',
+    price: '',
     unit: 'kg',
     description: '',
-    stock: 0
+    stock: ''
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,18 +95,25 @@ const InventoryPage = () => {
   const handleProductSubmit = async (e) => {
     e.preventDefault();
     try {
+      const submissionData = {
+        ...productForm,
+        buyPrice: productForm.buyPrice === '' ? 0 : parseFloat(productForm.buyPrice),
+        price: productForm.price === '' ? 0 : parseFloat(productForm.price),
+        stock: productForm.stock === '' ? 0 : parseFloat(productForm.stock)
+      };
+
       if (modalMode === 'create') {
-        await offlinePost(`${API_URL}/api/products`, productForm, {
+        await offlinePost(`${API_URL}/api/products`, submissionData, {
           headers: { Authorization: `Bearer ${user.token}` }
         }, { type: 'create_product' });
       } else {
-        await offlinePut(`${API_URL}/api/products/${selectedProduct._id}`, productForm, {
+        await offlinePut(`${API_URL}/api/products/${selectedProduct._id}`, submissionData, {
           headers: { Authorization: `Bearer ${user.token}` }
         }, { type: 'update_product' });
       }
       setShowProductModal(false);
       fetchProducts();
-      setProductForm({ name: '', category: 'new', buyPrice: 0, price: 0, unit: 'kg', description: '', stock: 0 });
+      setProductForm({ name: '', category: 'new', buyPrice: '', price: '', unit: 'kg', description: '', stock: '' });
     } catch (error) {
       alert(t('errorSavingProduct'));
     }
@@ -132,18 +139,18 @@ const InventoryPage = () => {
     setProductForm({
       name: p.name,
       category: p.category,
-      buyPrice: p.buyPrice || 0,
-      price: p.price,
+      buyPrice: p.buyPrice !== undefined && p.buyPrice !== null ? p.buyPrice : '',
+      price: p.price !== undefined && p.price !== null ? p.price : '',
       unit: p.unit,
       description: p.description || '',
-      stock: p.stock
+      stock: p.stock !== undefined && p.stock !== null ? p.stock : ''
     });
     setModalMode('edit');
     setShowProductModal(true);
   };
 
   const openCreateModal = () => {
-    setProductForm({ name: '', category: 'new', buyPrice: 0, price: 0, unit: 'kg', description: '', stock: 0 });
+    setProductForm({ name: '', category: 'new', buyPrice: '', price: '', unit: 'kg', description: '', stock: '' });
     setModalMode('create');
     setShowProductModal(true);
   };
