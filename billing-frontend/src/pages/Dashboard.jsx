@@ -27,6 +27,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(transactions.length === 0);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [viewingTransaction, setViewingTransaction] = useState(null);
 
   const fetchTransactions = async () => {
     try {
@@ -242,8 +243,15 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold text-white mb-8">{t('recentActivity')}</h3>
             <div className="space-y-6">
                 {recentActivity.map((act) => (
-                    <div key={act.id} className="flex items-start space-x-4 group">
-                        <div className={`mt-1 p-2 rounded-xl bg-${act.color}-500/10 text-${act.color}-500 group-hover:bg-${act.color}-500/20 transition-colors`}>
+                    <div 
+                        key={act.id} 
+                        onClick={() => {
+                            const fullTx = transactions.find(t => t._id === act.id);
+                            if (fullTx) setViewingTransaction(fullTx);
+                        }}
+                        className="flex items-start space-x-4 group cursor-pointer hover:bg-slate-800/25 p-2 -mx-2 rounded-xl transition-all"
+                    >
+                        <div className={`mt-1 p-2 rounded-xl bg-${act.color}-500/10 text-${act.color}-500 group-hover:bg-${act.color}-500/20 transition-colors shrink-0`}>
                             <Activity size={16} />
                         </div>
                         <div className="flex-1 pb-4 border-b border-slate-100 last:border-0 relative">
@@ -289,7 +297,11 @@ const Dashboard = () => {
 
                 <div className="space-y-4">
                     {transactions.map((tx) => (
-                        <div key={tx._id} className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 group">
+                        <div 
+                            key={tx._id} 
+                            onClick={() => setViewingTransaction(tx)}
+                            className="p-6 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-100 hover:border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 group cursor-pointer transition-all"
+                        >
                             <div className="flex items-center space-x-4">
                                 <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400">
                                     <Activity size={20} />
@@ -312,7 +324,7 @@ const Dashboard = () => {
 
                                 {(user.role === 'admin' || user.role === 'super_admin') && (
                                     <button
-                                        onClick={() => handleDelete(tx._id)}
+                                        onClick={(e) => { e.stopPropagation(); handleDelete(tx._id); }}
                                         className="p-3 bg-white hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-xl border border-slate-100 transition-all shadow-sm"
                                         title={t('delete')}
                                     >
