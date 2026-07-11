@@ -11,11 +11,12 @@ import {
   TrendingDown,
   TrendingUp,
   X,
-  Minus
+  Minus,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
-import { offlineGet, offlinePost, offlinePut } from '../utils/offlineApi';
+import { offlineGet, offlinePost, offlinePut, offlineDelete } from '../utils/offlineApi';
 
 const InventoryPage = () => {
   const { t } = useTranslation();
@@ -108,6 +109,21 @@ const InventoryPage = () => {
       setProductForm({ name: '', category: 'new', buyPrice: 0, price: 0, unit: 'kg', description: '', stock: 0 });
     } catch (error) {
       alert(t('errorSavingProduct'));
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await offlineDelete(`${API_URL}/api/products/${id}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      }, { type: 'delete_product' });
+      // Update local state immediately
+      setProducts(prev => prev.filter(p => p._id !== id));
+      const cached = JSON.parse(localStorage.getItem('rts_products') || '[]');
+      localStorage.setItem('rts_products', JSON.stringify(cached.filter(p => p._id !== id)));
+    } catch (error) {
+      alert('Error deleting product');
     }
   };
 
@@ -236,9 +252,16 @@ const InventoryPage = () => {
               <div className="text-right flex flex-col items-end space-y-1">
                 <p className="text-sm font-black text-slate-900 leading-none">{p.stock.toLocaleString()} {p.unit}</p>
                 <p className="text-[10px] font-bold text-slate-400">₹{p.price}/ {p.unit}</p>
-                <button onClick={() => openEditModal(p)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
-                  <Edit3 size={14} />
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button onClick={() => openEditModal(p)} className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors">
+                    <Edit3 size={14} />
+                  </button>
+                  {(user.role === 'admin' || user.role === 'super_admin') && (
+                    <button onClick={() => handleDeleteProduct(p._id)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -300,15 +323,21 @@ const InventoryPage = () => {
                                       <Plus size={16} />
                                   </button>
                                   <button
-                                      onClick={() => openEditModal(p)}
-                                      className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm"
-                                      title={t('editProduct')}
-                                  >
-                                      <Edit3 size={16} />
-                                  </button>
-                                  <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm">
-                                      <MoreVertical size={16} />
-                                  </button>
+                                       onClick={() => openEditModal(p)}
+                                       className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 transition-all shadow-sm"
+                                       title={t('editProduct')}
+                                   >
+                                       <Edit3 size={16} />
+                                   </button>
+                                   {(user.role === 'admin' || user.role === 'super_admin') && (
+                                       <button
+                                           onClick={() => handleDeleteProduct(p._id)}
+                                           className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-rose-600 hover:border-rose-500/40 transition-all shadow-sm"
+                                           title={t('deleteProduct') || 'Delete Product'}
+                                       >
+                                           <Trash2 size={16} />
+                                       </button>
+                                   )}
                               </div>
                           </td>
                       </tr>

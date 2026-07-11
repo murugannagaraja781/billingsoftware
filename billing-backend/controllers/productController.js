@@ -10,9 +10,9 @@ const getProducts = async (req, res) => {
 };
 
 const createProduct = async (req, res) => {
-    const { name, category, price, description, unit, stock } = req.body;
+    const { name, category, buyPrice, price, description, unit, stock } = req.body;
     try {
-        const product = new Product({ name, category, price, description, unit, stock });
+        const product = new Product({ name, category, buyPrice, price, description, unit, stock });
         const createdProduct = await product.save();
         res.status(201).json(createdProduct);
     } catch (error) {
@@ -21,12 +21,13 @@ const createProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-    const { name, category, price, description, unit, stock } = req.body;
+    const { name, category, buyPrice, price, description, unit, stock } = req.body;
     try {
         const product = await Product.findById(req.params.id);
         if (product) {
             product.name = name || product.name;
             product.category = category || product.category;
+            product.buyPrice = buyPrice !== undefined ? buyPrice : product.buyPrice;
             product.price = price || product.price;
             product.description = description || product.description;
             product.unit = unit || product.unit;
@@ -41,4 +42,18 @@ const updateProduct = async (req, res) => {
     }
 };
 
-module.exports = { getProducts, createProduct, updateProduct };
+const deleteProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+            await Product.findByIdAndDelete(req.params.id);
+            res.json({ message: 'Product removed' });
+        } else {
+            res.status(404).json({ message: 'Product not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getProducts, createProduct, updateProduct, deleteProduct };
