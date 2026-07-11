@@ -1005,20 +1005,7 @@ const BillingPage = () => {
                           </div>
                       </div>
 
-                      {/* Footer & Bank Info */}
-                      <div 
-                        className="invoice-footer border-t border-dashed border-slate-400 text-center"
-                        style={{ marginTop: printConfig.footerMt, paddingTop: '6px' }}
-                      >
-                          {invoiceHeader.taxId && <p style={{ fontSize: '9px', margin: '2px 0' }}>{invoiceHeader.taxId}</p>}
-                          {invoiceHeader.bankName && (
-                              <p style={{ fontSize: '9px', margin: '2px 0', color: '#333' }}>
-                                  Bank: {invoiceHeader.bankName} | A/C: {invoiceHeader.bankAccNo} | IFSC: {invoiceHeader.bankIfsc}
-                              </p>
-                          )}
-                          {invoiceHeader.paymentTerms && <p style={{ fontSize: '9px', margin: '2px 0', color: '#333' }}>{invoiceHeader.paymentTerms}</p>}
-                          <p className="font-black uppercase tracking-wider italic mt-2" style={{ fontSize: '9px' }}>Thank you for choosing {invoiceHeader.companyName}</p>
-                      </div>
+
                   </div>
               </div>
           );
@@ -1061,12 +1048,12 @@ const BillingPage = () => {
                   break-inside: avoid !important;
               }
               
-              /* Ultra-tight padding for thermal roll paper */
+              /* Safe left/right padding to prevent names getting cut off on 80mm roll */
               #printable-invoice .invoice-container {
                   padding-top: 1mm !important;
                   padding-bottom: 2mm !important;
-                  padding-left: 2mm !important;
-                  padding-right: 2mm !important;
+                  padding-left: 6mm !important;
+                  padding-right: 6mm !important;
                   box-sizing: border-box !important;
                   width: 80mm !important;
                   max-width: 80mm !important;
