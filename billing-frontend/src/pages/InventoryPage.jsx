@@ -250,7 +250,7 @@ const InventoryPage = () => {
                 </div>
               </div>
               <div className="text-right flex flex-col items-end space-y-1">
-                <p className="text-sm font-black text-slate-900 leading-none">{p.stock.toLocaleString()} {p.unit}</p>
+                <p className="text-sm font-black text-slate-900 leading-none">{(p.stock || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {p.unit}</p>
                 <p className="text-[10px] font-bold text-slate-400">Sell: ₹{p.price}/ {p.unit}</p>
                 <p className="text-[10px] font-bold text-emerald-600">Buy: ₹{p.buyPrice || 0}/ {p.unit}</p>
                 <div className="flex items-center space-x-2">
@@ -303,8 +303,8 @@ const InventoryPage = () => {
                     </span>
                   </td>
                           <td className="px-8 py-6">
-                    <div className="flex flex-col">
-                      <span className={`text-xs font-black ${p.stock < 10 ? 'text-rose-500' : 'text-slate-900'}`}>{p.stock.toLocaleString()} {p.unit}</span>
+                     <div className="flex flex-col">
+                      <span className={`text-xs font-black ${p.stock < 10 ? 'text-rose-500' : 'text-slate-900'}`}>{(p.stock || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {p.unit}</span>
                       <span className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">{p.stock < 10 ? t('lowStock') : t('inStock')}</span>
                     </div>
                   </td>

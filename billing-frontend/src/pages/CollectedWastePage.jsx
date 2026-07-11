@@ -185,7 +185,7 @@ const CollectedWastePage = () => {
         <div className="glass-card p-6 bg-white border-white/5 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('totalWasteStock')}</p>
-            <h3 className="text-3xl font-black text-slate-900">{totalStockKg.toLocaleString()} {t('kg')}</h3>
+            <h3 className="text-3xl font-black text-slate-900">{totalStockKg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {t('kg')}</h3>
             <p className="text-xs font-semibold text-slate-400 mt-1">{t('inStock')}</p>
           </div>
           <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
@@ -248,7 +248,7 @@ const CollectedWastePage = () => {
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
                         <p className={`text-sm font-black ${p.stock < 50 ? 'text-amber-500' : 'text-slate-900'}`}>
-                          {p.stock} {p.unit || t('kg')}
+                          {(p.stock || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {p.unit || t('kg')}
                         </p>
                         <p className="text-[9px] font-bold text-slate-400 uppercase">
                           {p.stock < 50 ? t('lowStock') : t('inStock')}
@@ -327,7 +327,7 @@ const CollectedWastePage = () => {
                           </span>
                         </td>
                         <td className="py-4 text-xs font-black text-slate-900 text-right">
-                          {col.quantity.toLocaleString()} {t('kg')}
+                          {col.quantity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {t('kg')}
                         </td>
                         <td className="py-4 text-xs font-bold text-slate-500 text-right">
                           ₹{col.unitPrice}

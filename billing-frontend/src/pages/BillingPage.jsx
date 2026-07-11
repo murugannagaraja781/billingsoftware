@@ -930,7 +930,7 @@ const BillingPage = () => {
                                               {item.productName}
                                           </td>
                                           <td className="text-center py-1 px-0.5" style={{ fontSize: printConfig.fontSize }}>
-                                              {item.quantity} <span style={{ fontSize: '8px', textTransform: 'uppercase' }}>{item.unit}</span>
+                                              {Number(item.quantity).toFixed(2)} <span style={{ fontSize: '8px', textTransform: 'uppercase' }}>{item.unit}</span>
                                           </td>
                                           <td className="text-right py-1 px-0.5" style={{ fontSize: printConfig.fontSize }}>
                                               ₹{item.unitPrice.toFixed(2)}
