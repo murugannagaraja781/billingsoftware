@@ -12,7 +12,8 @@ import {
   Bell,
   Download,
   Trash2,
-  Calendar
+  Calendar,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
@@ -259,14 +260,24 @@ const Dashboard = () => {
                             <p className="text-[12px] text-slate-500 mt-0.5 font-medium">{act.desc}</p>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 leading-none">{act.time}</p>
 
-                            {(user.role === 'admin' || user.role === 'super_admin') && (
+                            <div className="absolute right-0 top-0 flex items-center space-x-1.5 no-print">
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(act.id); }}
-                                    className="absolute right-0 top-0 p-2 text-slate-300 hover:text-red-500 transition-colors"
+                                    onClick={(e) => { e.stopPropagation(); const fullTx = transactions.find(t => t._id === act.id); if (fullTx) setViewingTransaction(fullTx); }}
+                                    className="p-1.5 text-slate-400 hover:text-white transition-colors"
+                                    title={t('view') || 'View'}
                                 >
-                                    <Trash2 size={16} />
+                                    <Eye size={16} />
                                 </button>
-                            )}
+                                {(user.role === 'admin' || user.role === 'super_admin') && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleDelete(act.id); }}
+                                        className="p-1.5 text-slate-400 hover:text-red-500 transition-colors"
+                                        title={t('delete')}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -316,21 +327,30 @@ const Dashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-8 w-full md:w-auto justify-between md:justify-end">
+                            <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
                                 <div className="text-right">
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{t('netAmount')}</p>
                                     <p className="text-lg font-black text-slate-900">₹{tx.netAmount.toLocaleString()}</p>
                                 </div>
 
-                                {(user.role === 'admin' || user.role === 'super_admin') && (
+                                <div className="flex items-center space-x-2">
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); handleDelete(tx._id); }}
-                                        className="p-3 bg-white hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-xl border border-slate-100 transition-all shadow-sm"
-                                        title={t('delete')}
+                                        onClick={(e) => { e.stopPropagation(); setViewingTransaction(tx); }}
+                                        className="p-3 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-900 rounded-xl border border-slate-200/60 transition-all shadow-sm"
+                                        title={t('view') || 'View'}
                                     >
-                                        <Trash2 size={18} />
+                                        <Eye size={18} />
                                     </button>
-                                )}
+                                    {(user.role === 'admin' || user.role === 'super_admin') && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(tx._id); }}
+                                            className="p-3 bg-white hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-xl border border-slate-100 transition-all shadow-sm"
+                                            title={t('delete')}
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
