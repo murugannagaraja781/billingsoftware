@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useAuth, AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SocketProvider } from './context/SocketContext';
+import { OfflineProvider } from './context/OfflineContext';
 import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
 import NotificationBell from './components/NotificationBell';
@@ -277,20 +278,22 @@ const App = () => {
     <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center text-white">Loading...</div>}>
       <ThemeProvider>
         <AuthProvider>
-          <SocketProvider>
-            <Router>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/" element={<RoleBasedHome />} />
-                <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
-                <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
-                <Route path="/collected-waste" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><CollectedWastePage /></MainLayout></ProtectedRoute>} />
-                <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
-                <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </Router>
-          </SocketProvider>
+          <OfflineProvider>
+            <SocketProvider>
+              <Router>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/" element={<RoleBasedHome />} />
+                  <Route path="/billing" element={<MainLayout><BillingPage /></MainLayout>} />
+                  <Route path="/inventory" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><InventoryPage /></MainLayout></ProtectedRoute>} />
+                  <Route path="/collected-waste" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><CollectedWastePage /></MainLayout></ProtectedRoute>} />
+                  <Route path="/stores" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><StorePage /></MainLayout></ProtectedRoute>} />
+                  <Route path="/users" element={<ProtectedRoute allowedRoles={['super_admin', 'admin']}><MainLayout><UserPage /></MainLayout></ProtectedRoute>} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </Router>
+            </SocketProvider>
+          </OfflineProvider>
         </AuthProvider>
       </ThemeProvider>
     </React.Suspense>

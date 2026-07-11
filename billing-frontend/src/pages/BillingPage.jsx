@@ -19,9 +19,9 @@ import {
   Calendar,
   LogOut
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlinePost } from '../utils/offlineApi';
 
 const BillingPage = () => {
   const { t } = useTranslation();
@@ -73,10 +73,10 @@ const BillingPage = () => {
 
   const fetchStoreDetails = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/stores`, {
+      const result = await offlineGet(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
-      localStorage.setItem('rts_stores', JSON.stringify(data));
+      }, 'rts_stores');
+      const data = result.data;
       if (user.storeId && data.length > 0) {
         const myStore = data.find(s => s._id === user.storeId);
         if (myStore) {
@@ -96,9 +96,8 @@ const BillingPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/products`);
-      setProducts(data);
-      localStorage.setItem('rts_products', JSON.stringify(data));
+      const result = await offlineGet(`${API_URL}/api/products`, {}, 'rts_products');
+      setProducts(result.data);
     } catch (error) {
       console.error(error);
     }
@@ -106,11 +105,11 @@ const BillingPage = () => {
 
   const fetchCustomers = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/customers`, {
+      const result = await offlineGet(`${API_URL}/api/customers`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
+      }, 'rts_customers');
+      const data = result.data;
       setCustomers(data);
-      localStorage.setItem('rts_customers', JSON.stringify(data));
       if (data.length > 0 && (customer.name === t('selectCustomerTitle') || customer._id === '')) {
           const defaultCust = data.find(c => c.name.toLowerCase().includes('thangavel')) || data[0];
           setCustomer(defaultCust);
@@ -124,15 +123,19 @@ const BillingPage = () => {
   const handleCreateCustomer = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${API_URL}/api/customers`, newCustForm, {
+      const result = await offlinePost(`${API_URL}/api/customers`, newCustForm, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
+      }, { type: 'create_customer' });
+      const data = result.data;
       setCustomers([...customers, data]);
       setCustomer(data);
       setShowNewCustModal(false);
       setNewCustForm({ name: '', phone: '9876543210', address: '', gstNumber: '' });
+      if (result.queued) {
+        alert('Customer saved offline — will sync when internet returns');
+      }
     } catch (error) {
-      alert(error.response?.data?.message || 'Error creating customer');
+      alert(error.response?.data?.message || error.message || 'Error creating customer');
     }
   };
 
@@ -235,11 +238,17 @@ const BillingPage = () => {
         storeId: user.storeId,
         invoiceId: invoiceId
       };
-      await axios.post(`${API_URL}/api/transactions`, transactionData, {
+      const result = await offlinePost(`${API_URL}/api/transactions`, transactionData, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
+      }, { type: 'create_transaction' });
       setLastTransaction(transactionData);
       setShowSuccessModal(true);
+      if (result.queued) {
+        // Save offline transaction to local transactions list too
+        const cachedTxns = JSON.parse(localStorage.getItem('rts_transactions') || '[]');
+        cachedTxns.unshift({ ...transactionData, _id: result.data._id, createdAt: new Date().toISOString(), _offline: true });
+        localStorage.setItem('rts_transactions', JSON.stringify(cachedTxns));
+      }
     } catch (error) {
       console.error("Bill generation error:", error);
       const errMsg = error.response?.data?.message || error.message;

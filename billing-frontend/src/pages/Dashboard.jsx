@@ -14,9 +14,9 @@ import {
   Trash2,
   Calendar
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlineDelete } from '../utils/offlineApi';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -30,11 +30,10 @@ const Dashboard = () => {
 
   const fetchTransactions = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/transactions`, {
+      const result = await offlineGet(`${API_URL}/api/transactions`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setTransactions(data);
-      localStorage.setItem('rts_transactions', JSON.stringify(data));
+      }, 'rts_transactions');
+      setTransactions(result.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -49,10 +48,13 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this bill?')) return;
     try {
-      await axios.delete(`${API_URL}/api/transactions/${id}`, {
+      await offlineDelete(`${API_URL}/api/transactions/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
-      fetchTransactions();
+      }, { type: 'delete_transaction' });
+      // Remove from local state immediately
+      setTransactions(prev => prev.filter(tx => tx._id !== id));
+      const cached = JSON.parse(localStorage.getItem('rts_transactions') || '[]');
+      localStorage.setItem('rts_transactions', JSON.stringify(cached.filter(tx => tx._id !== id)));
     } catch (error) {
       alert('Error deleting transaction');
     }

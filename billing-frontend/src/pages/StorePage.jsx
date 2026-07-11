@@ -10,9 +10,9 @@ import {
   Search,
   Building2
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlinePost, offlinePut } from '../utils/offlineApi';
 
 const StorePage = () => {
   const { t } = useTranslation();
@@ -33,11 +33,10 @@ const StorePage = () => {
 
   const fetchStores = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/stores`, {
+      const result = await offlineGet(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setStores(data);
-      localStorage.setItem('rts_stores', JSON.stringify(data));
+      }, 'rts_stores');
+      setStores(result.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -49,13 +48,13 @@ const StorePage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post(`${API_URL}/api/stores`, form, {
+        await offlinePost(`${API_URL}/api/stores`, form, {
           headers: { Authorization: `Bearer ${user.token}` }
-        });
+        }, { type: 'create_store' });
       } else {
-        await axios.put(`${API_URL}/api/stores/${selectedStore._id}`, form, {
+        await offlinePut(`${API_URL}/api/stores/${selectedStore._id}`, form, {
           headers: { Authorization: `Bearer ${user.token}` }
-        });
+        }, { type: 'update_store' });
       }
       setShowModal(false);
       fetchStores();

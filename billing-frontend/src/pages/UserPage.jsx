@@ -11,9 +11,9 @@ import {
   Lock,
   Building2
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlinePost, offlinePut } from '../utils/offlineApi';
 
 const UserPage = () => {
   const { t } = useTranslation();
@@ -38,16 +38,14 @@ const UserPage = () => {
 
   const fetchData = async () => {
     try {
-      const usersRes = await axios.get(`${API_URL}/api/users`, {
+      const usersResult = await offlineGet(`${API_URL}/api/users`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
-      });
-      const storesRes = await axios.get(`${API_URL}/api/stores`, {
+      }, 'rts_users');
+      const storesResult = await offlineGet(`${API_URL}/api/stores`, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
-      });
-      setUsers(usersRes.data);
-      setStores(storesRes.data);
-      localStorage.setItem('rts_users', JSON.stringify(usersRes.data));
-      localStorage.setItem('rts_stores', JSON.stringify(storesRes.data));
+      }, 'rts_stores');
+      setUsers(usersResult.data);
+      setStores(storesResult.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -59,13 +57,13 @@ const UserPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post(`${API_URL}/api/users`, form, {
+        await offlinePost(`${API_URL}/api/users`, form, {
           headers: { Authorization: `Bearer ${currentUser.token}` }
-        });
+        }, { type: 'create_user' });
       } else {
-        await axios.put(`${API_URL}/api/users/${selectedUser._id}`, form, {
+        await offlinePut(`${API_URL}/api/users/${selectedUser._id}`, form, {
           headers: { Authorization: `Bearer ${currentUser.token}` }
-        });
+        }, { type: 'update_user' });
       }
       setShowModal(false);
       fetchData();

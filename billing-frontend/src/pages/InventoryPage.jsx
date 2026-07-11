@@ -13,9 +13,9 @@ import {
   X,
   Minus
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlinePost, offlinePut } from '../utils/offlineApi';
 
 const InventoryPage = () => {
   const { t } = useTranslation();
@@ -60,9 +60,8 @@ const InventoryPage = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/products`);
-      setProducts(data);
-      localStorage.setItem('rts_products', JSON.stringify(data));
+      const result = await offlineGet(`${API_URL}/api/products`, {}, 'rts_products');
+      setProducts(result.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -77,13 +76,15 @@ const InventoryPage = () => {
         ? selectedProduct.stock + adjustment.quantity
         : selectedProduct.stock - adjustment.quantity;
 
-      await axios.put(`${API_URL}/api/products/${selectedProduct._id}`,
+      await offlinePut(`${API_URL}/api/products/${selectedProduct._id}`,
         { stock: newStock },
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${user.token}` } },
+        { type: 'adjust_stock' }
       );
 
+      // Update local state immediately
+      setProducts(prev => prev.map(p => p._id === selectedProduct._id ? { ...p, stock: newStock } : p));
       setShowModal(false);
-      fetchProducts();
       setAdjustment({ type: 'add', quantity: 0, reason: '' });
     } catch (error) {
       alert(t('errorUpdatingStock'));
@@ -94,13 +95,13 @@ const InventoryPage = () => {
     e.preventDefault();
     try {
       if (modalMode === 'create') {
-        await axios.post(`${API_URL}/api/products`, productForm, {
+        await offlinePost(`${API_URL}/api/products`, productForm, {
           headers: { Authorization: `Bearer ${user.token}` }
-        });
+        }, { type: 'create_product' });
       } else {
-        await axios.put(`${API_URL}/api/products/${selectedProduct._id}`, productForm, {
+        await offlinePut(`${API_URL}/api/products/${selectedProduct._id}`, productForm, {
           headers: { Authorization: `Bearer ${user.token}` }
-        });
+        }, { type: 'update_product' });
       }
       setShowProductModal(false);
       fetchProducts();

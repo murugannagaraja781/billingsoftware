@@ -13,9 +13,9 @@ import {
   AlertTriangle,
   Download
 } from 'lucide-react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
+import { offlineGet, offlinePut } from '../utils/offlineApi';
 
 const CollectedWastePage = () => {
   const { t } = useTranslation();
@@ -41,9 +41,9 @@ const CollectedWastePage = () => {
 
   const fetchWasteProducts = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/products`);
+      const result = await offlineGet(`${API_URL}/api/products`, {}, 'rts_products');
       // Filter for category === 'waste'
-      const wasteItems = data.filter(p => p.category === 'waste');
+      const wasteItems = result.data.filter(p => p.category === 'waste');
       setWasteProducts(wasteItems);
       localStorage.setItem('rts_waste_products', JSON.stringify(wasteItems));
     } catch (error) {
@@ -53,11 +53,10 @@ const CollectedWastePage = () => {
 
   const fetchTransactions = async () => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/transactions`, {
+      const result = await offlineGet(`${API_URL}/api/transactions`, {
         headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setTransactions(data);
-      localStorage.setItem('rts_transactions', JSON.stringify(data));
+      }, 'rts_transactions');
+      setTransactions(result.data);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
@@ -80,13 +79,15 @@ const CollectedWastePage = () => {
         ? selectedProduct.stock + adjustment.quantity
         : selectedProduct.stock - adjustment.quantity;
 
-      await axios.put(`${API_URL}/api/products/${selectedProduct._id}`,
+      await offlinePut(`${API_URL}/api/products/${selectedProduct._id}`,
         { stock: newStock },
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${user.token}` } },
+        { type: 'adjust_stock' }
       );
 
+      // Update local state immediately
+      setWasteProducts(prev => prev.map(p => p._id === selectedProduct._id ? { ...p, stock: newStock } : p));
       setShowModal(false);
-      fetchWasteProducts();
       setAdjustment({ type: 'add', quantity: 0, reason: '' });
     } catch (error) {
       alert(t('errorUpdatingStock'));
