@@ -358,6 +358,101 @@ const Dashboard = () => {
             </div>
         </div>
       )}
+
+      {/* Transaction Details Modal */}
+      {viewingTransaction && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4">
+            <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-[32px] p-8 md:p-10 relative shadow-2xl max-h-[90vh] overflow-y-auto text-white">
+                <button
+                    onClick={() => setViewingTransaction(null)}
+                    className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"
+                >
+                    <XIcon size={24} />
+                </button>
+                <div className="mb-6 border-b border-slate-800 pb-4">
+                    <span className="px-2.5 py-1 rounded-full bg-red-500/10 text-red-500 text-[9px] font-black uppercase tracking-widest">
+                        {viewingTransaction.totalNewAmount > 0 ? t('sales') : t('scrap')}
+                    </span>
+                    <h3 className="text-xl font-black text-white mt-3 tracking-tight">#{viewingTransaction.invoiceId}</h3>
+                    <p className="text-slate-400 text-xs font-semibold mt-1">
+                        {new Date(viewingTransaction.createdAt).toLocaleDateString()} at {new Date(viewingTransaction.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                </div>
+
+                <div className="space-y-5 mb-6">
+                    <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">{t('customer')}</p>
+                        <p className="text-sm font-black text-white leading-none">{viewingTransaction.customerName}</p>
+                        {viewingTransaction.customerPhone && <p className="text-xs font-semibold text-slate-400 mt-1">{viewingTransaction.customerPhone}</p>}
+                    </div>
+
+                    <div className="h-px bg-slate-800"></div>
+
+                    {/* Items List */}
+                    <div>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('items')}</p>
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            {viewingTransaction.items.map((item, idx) => (
+                                <div key={idx} className="flex justify-between items-center bg-slate-800/40 p-3.5 rounded-2xl border border-slate-800">
+                                    <div>
+                                        <p className="text-xs font-black text-white">{item.productName}</p>
+                                        <p className="text-[10px] font-bold text-slate-400 mt-0.5">
+                                            {Number(item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {item.unit || 'kg'} x ₹{item.unitPrice}
+                                        </p>
+                                    </div>
+                                    <span className={`text-xs font-black ${item.type === 'bought' ? 'text-amber-500' : 'text-white'}`}>
+                                        {item.type === 'bought' ? '-' : ''}₹{item.subTotal.toFixed(2)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-slate-800"></div>
+
+                    {/* Totals Summary */}
+                    <div className="space-y-2 bg-slate-800/20 p-4 rounded-2xl border border-dashed border-slate-800">
+                        <div className="flex justify-between items-center text-xs font-bold text-slate-400">
+                            <span>Total Sales (+)</span>
+                            <span>₹{viewingTransaction.totalNewAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-bold text-amber-500">
+                            <span>Total Scrap Buy (-)</span>
+                            <span>-₹{viewingTransaction.totalWasteAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="h-px bg-slate-800 my-1"></div>
+                        <div className="flex justify-between items-center text-sm font-black text-white">
+                            <span className="uppercase">{t('netReceivable')}</span>
+                            <span className="text-red-500">₹{viewingTransaction.netAmount.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        onClick={() => setViewingTransaction(null)}
+                        className="px-6 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl tracking-widest uppercase text-[10px] font-black transition-colors"
+                    >
+                        {t('close')}
+                    </button>
+                    {(user.role === 'admin' || user.role === 'super_admin') && (
+                        <button
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to delete this bill?')) {
+                                    handleDelete(viewingTransaction._id);
+                                    setViewingTransaction(null);
+                                }
+                            }}
+                            className="px-6 py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/20 rounded-2xl tracking-widest uppercase text-[10px] font-black transition-all flex items-center justify-center space-x-2"
+                        >
+                            <Trash2 size={14} />
+                            <span>{t('delete')}</span>
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
