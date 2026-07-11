@@ -251,7 +251,8 @@ const InventoryPage = () => {
               </div>
               <div className="text-right flex flex-col items-end space-y-1">
                 <p className="text-sm font-black text-slate-900 leading-none">{p.stock.toLocaleString()} {p.unit}</p>
-                <p className="text-[10px] font-bold text-slate-400">₹{p.price}/ {p.unit}</p>
+                <p className="text-[10px] font-bold text-slate-400">Sell: ₹{p.price}/ {p.unit}</p>
+                <p className="text-[10px] font-bold text-emerald-600">Buy: ₹{p.buyPrice || 0}/ {p.unit}</p>
                 <div className="flex items-center space-x-2">
                   <button onClick={() => openEditModal(p)} className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors">
                     <Edit3 size={14} />
