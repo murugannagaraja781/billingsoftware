@@ -889,7 +889,7 @@ const BillingPage = () => {
                 style={{ fontSize: printConfig.fontSize, width: '80mm', maxWidth: '80mm' }}
               >
                   <div className="invoice-container">
-                      {/* Centered Receipt Header */}
+                      {/* Centered Receipt Header - Minimal Estimate Only */}
                       <div 
                         className="invoice-header text-center border-b border-dashed border-slate-400"
                         style={{ 
@@ -897,16 +897,7 @@ const BillingPage = () => {
                           paddingBottom: printConfig.headerPb
                         }}
                       >
-                          {printConfig.showLogo && (
-                              <div className="bg-white overflow-hidden logo-wrapper mx-auto mb-1" style={{ width: printConfig.logoSize, height: printConfig.logoSize }}>
-                                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                              </div>
-                          )}
-                          <h1 className="font-black uppercase tracking-tight" style={{ fontSize: printConfig.headerTitleSize }}>{invoiceHeader.companyName}</h1>
-                          {invoiceHeader.storeSubtitle && <p className="font-bold" style={{ fontSize: printConfig.subtitleSize, margin: '2px 0' }}>{invoiceHeader.storeSubtitle}</p>}
-                          {invoiceHeader.address && <p style={{ fontSize: '9px', color: '#333', margin: '2px 0' }}>{invoiceHeader.address}</p>}
-                          {invoiceHeader.contact && <p style={{ fontSize: '9px', color: '#333', margin: '2px 0' }}>{invoiceHeader.contact}</p>}
-                          <h2 className="font-black uppercase tracking-widest mt-2 border-t border-b border-dashed border-slate-300 py-0.5" style={{ fontSize: '11px' }}>Estimate</h2>
+                          <h2 className="font-black uppercase tracking-widest py-0.5" style={{ fontSize: '13px' }}>Estimate</h2>
                       </div>
 
                       {/* Compact Receipt Info */}
