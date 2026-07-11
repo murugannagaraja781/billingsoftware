@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import API_URL from '../config';
-import { offlineGet, offlinePost } from '../utils/offlineApi';
+import { offlineGet, offlinePost, offlineDelete } from '../utils/offlineApi';
 
 const BillingPage = () => {
   const { t } = useTranslation();
@@ -241,7 +241,7 @@ const BillingPage = () => {
       const result = await offlinePost(`${API_URL}/api/transactions`, transactionData, {
         headers: { Authorization: `Bearer ${user.token}` }
       }, { type: 'create_transaction' });
-      setLastTransaction(transactionData);
+      setLastTransaction(result.data || { ...transactionData, _id: result.data?._id || 'temp-' + Date.now() });
       setShowSuccessModal(true);
       if (result.queued) {
         // Save offline transaction to local transactions list too
@@ -262,6 +262,27 @@ const BillingPage = () => {
     setBillItems([]);
     setShowSuccessModal(false);
     // Optionally regenerate invoice ID here if needed
+  };
+
+  const handleDeleteLastTransaction = async () => {
+    if (!lastTransaction || !lastTransaction._id) return;
+    if (!window.confirm('Are you sure you want to delete this bill?')) return;
+    try {
+      await offlineDelete(`${API_URL}/api/transactions/${lastTransaction._id}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      }, { type: 'delete_transaction' });
+      
+      // Update cached transactions in localStorage
+      const cached = JSON.parse(localStorage.getItem('rts_transactions') || '[]');
+      localStorage.setItem('rts_transactions', JSON.stringify(cached.filter(tx => tx._id !== lastTransaction._id)));
+      
+      alert('Bill deleted successfully');
+      setShowSuccessModal(false);
+      setLastTransaction(null);
+      setBillItems([]);
+    } catch (error) {
+      alert('Error deleting bill');
+    }
   };
 
   const getPrintConfig = () => {
@@ -874,6 +895,15 @@ const BillingPage = () => {
                     >
                         {t('closeNewBill')}
                     </button>
+                    {(user.role === 'admin' || user.role === 'super_admin') && (
+                        <button
+                            onClick={handleDeleteLastTransaction}
+                            className="w-full py-5 bg-rose-50 text-rose-600 rounded-3xl font-black tracking-widest uppercase text-xs flex items-center justify-center space-x-3 hover:bg-rose-100 transition-all border border-rose-200/50"
+                        >
+                            <Trash2 size={20} />
+                            <span>{t('deleteInvoice') || 'Delete Invoice'}</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
